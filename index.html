@@ -33,6 +33,269 @@
   <div class="ambient-glow-2"></div>
   <div class="cyber-grid-overlay"></div>
 
+  <!-- ==========================================
+       AUTHENTICATION & ONBOARDING SHELL
+       ========================================== -->
+  <div id="auth-container" style="display:none;">
+    
+    <!-- AUTH VIEW 1: SIGN IN -->
+    <div class="auth-card-view active" id="auth-view-login">
+      <div class="auth-header">
+        <div class="auth-brand-logo">
+          <img src="assets/app_icon.jpg" alt="Academiq OS">
+        </div>
+        <h2 class="auth-title">Welcome to Academiq 3D OS</h2>
+        <p class="auth-subtitle">Sign in to access your personalized adaptive learning cockpit</p>
+      </div>
+
+      <div class="auth-error-banner" id="login-error-banner"></div>
+
+      <form id="form-login">
+        <div class="form-group">
+          <label class="form-label">Academic Email</label>
+          <input type="email" class="form-input" id="login-email" placeholder="student@university.edu" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label class="form-label" style="margin-bottom:0;">Password</label>
+            <a href="#" data-auth-switch="forgot" style="font-size:12px; color:var(--primary-light); text-decoration:none;">Forgot password?</a>
+          </div>
+          <input type="password" class="form-input" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn-action btn-primary" id="btn-submit-login" style="width:100%; justify-content:center; padding:12px; font-size:15px; margin-top:8px;">
+          <span>⚡</span> Sign In to 3D Cockpit
+        </button>
+      </form>
+
+      <div class="auth-divider">
+        <span>OR</span>
+      </div>
+
+      <button type="button" class="btn-action btn-secondary" id="btn-google-login" style="width:100%; justify-content:center; padding:10px; font-size:13.5px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.04h3.88c2.27-2.09 3.66-5.17 3.66-9.14z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.04c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.94H1.24v3.13C3.26 21.36 7.34 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.6H1.24C.45 8.18 0 9.97 0 12s.45 3.82 1.24 5.4l4.04-3.13z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.24 6.6l4.04 3.13c.95-2.84 3.6-4.98 6.72-4.98z"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-footer-links">
+        Don't have an account? <a href="#" data-auth-switch="signup">Create account</a>
+      </div>
+    </div>
+
+    <!-- AUTH VIEW 2: SIGN UP -->
+    <div class="auth-card-view" id="auth-view-signup">
+      <div class="auth-header">
+        <div class="auth-brand-logo">
+          <img src="assets/app_icon.jpg" alt="Academiq OS">
+        </div>
+        <h2 class="auth-title">Create Academiq Account</h2>
+        <p class="auth-subtitle">Initialize your personalized AI student operating system</p>
+      </div>
+
+      <div class="auth-error-banner" id="signup-error-banner"></div>
+
+      <form id="form-signup">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="signup-name" placeholder="e.g. Praveen Kumar" required autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Academic Email</label>
+          <input type="email" class="form-input" id="signup-email" placeholder="praveen@univ.edu" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password (min 6 characters)</label>
+          <input type="password" class="form-input" id="signup-password" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" class="form-input" id="signup-confirm-password" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+
+        <button type="submit" class="btn-action btn-primary" id="btn-submit-signup" style="width:100%; justify-content:center; padding:12px; font-size:15px; margin-top:8px;">
+          <span>✦</span> Create Account & Calibrate
+        </button>
+      </form>
+
+      <div class="auth-footer-links">
+        Already have an account? <a href="#" data-auth-switch="login">Sign In</a>
+      </div>
+    </div>
+
+    <!-- AUTH VIEW 3: FORGOT PASSWORD -->
+    <div class="auth-card-view" id="auth-view-forgot">
+      <div class="auth-header">
+        <div class="auth-brand-logo">
+          <img src="assets/app_icon.jpg" alt="Academiq OS">
+        </div>
+        <h2 class="auth-title">Reset Your Password</h2>
+        <p class="auth-subtitle">Enter your email and we'll send recovery instructions</p>
+      </div>
+
+      <div class="auth-error-banner" id="forgot-error-banner"></div>
+      <div class="auth-success-banner" id="forgot-success-banner"></div>
+
+      <form id="form-forgot">
+        <div class="form-group">
+          <label class="form-label">Registered Academic Email</label>
+          <input type="email" class="form-input" id="forgot-email" placeholder="student@univ.edu" required>
+        </div>
+
+        <button type="submit" class="btn-action btn-primary" id="btn-submit-forgot" style="width:100%; justify-content:center; padding:12px; font-size:14.5px;">
+          Send Reset Instructions
+        </button>
+      </form>
+
+      <div class="auth-footer-links">
+        Remembered your password? <a href="#" data-auth-switch="login">Back to Sign In</a>
+      </div>
+    </div>
+
+    <!-- AUTH VIEW 4: 8-STEP ONBOARDING WIZARD -->
+    <div class="auth-card-view onboard-container" id="auth-view-onboarding">
+      <div class="auth-header" style="margin-bottom:16px;">
+        <div class="hero-badge-tag" style="margin-bottom:8px;">
+          <span>✦</span> ACADEMIC CALIBRATION ENGINE
+        </div>
+        <h2 class="auth-title">Build Your Learning System</h2>
+        <p class="auth-subtitle" id="onboard-step-indicator">Step 1 of 8</p>
+      </div>
+
+      <div class="onboard-progress-track">
+        <div class="onboard-progress-fill" id="onboard-progress-bar"></div>
+      </div>
+
+      <!-- Step 1: Full Name -->
+      <div class="onboard-step active" id="onboard-step-1">
+        <div class="form-group">
+          <label class="form-label" style="font-size:15px; color:#fff;">What is your full name?</label>
+          <input type="text" class="form-input" id="onboard-name" placeholder="e.g. Alex Vance" style="font-size:16px; padding:12px;">
+        </div>
+        <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+          <button type="button" class="btn-action btn-primary" data-onboard-next>Next Step →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: University / College -->
+      <div class="onboard-step" id="onboard-step-2">
+        <div class="form-group">
+          <label class="form-label" style="font-size:15px; color:#fff;">Which college or university do you attend?</label>
+          <input type="text" class="form-input" id="onboard-institution" placeholder="e.g. Stanford University / IIT Delhi" style="font-size:16px; padding:12px;">
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:20px;">
+          <button type="button" class="btn-action btn-secondary" data-onboard-prev>← Back</button>
+          <button type="button" class="btn-action btn-primary" data-onboard-next>Next Step →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Degree / Major -->
+      <div class="onboard-step" id="onboard-step-3">
+        <div class="form-group">
+          <label class="form-label" style="font-size:15px; color:#fff;">What is your degree or course of study?</label>
+          <input type="text" class="form-input" id="onboard-major" placeholder="e.g. Computer Science & AI" style="font-size:16px; padding:12px;">
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:20px;">
+          <button type="button" class="btn-action btn-secondary" data-onboard-prev>← Back</button>
+          <button type="button" class="btn-action btn-primary" data-onboard-next>Next Step →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Year / Semester -->
+      <div class="onboard-step" id="onboard-step-4">
+        <div class="form-group">
+          <label class="form-label" style="font-size:15px; color:#fff;">What year and semester are you currently in?</label>
+          <select class="form-select" id="onboard-semester" style="font-size:15px; padding:12px;">
+            <option value="Year 1, Semester 1">Year 1, Semester 1</option>
+            <option value="Year 1, Semester 2">Year 1, Semester 2</option>
+            <option value="Year 2, Semester 3" selected>Year 2, Semester 3</option>
+            <option value="Year 2, Semester 4">Year 2, Semester 4</option>
+            <option value="Year 3, Semester 5">Year 3, Semester 5</option>
+            <option value="Year 3, Semester 6">Year 3, Semester 6</option>
+            <option value="Year 4, Semester 7">Year 4, Semester 7</option>
+            <option value="Year 4, Semester 8">Year 4, Semester 8</option>
+            <option value="Graduate / Masters">Graduate / Masters</option>
+          </select>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:20px;">
+          <button type="button" class="btn-action btn-secondary" data-onboard-prev>← Back</button>
+          <button type="button" class="btn-action btn-primary" data-onboard-next>Next Step →</button>
+        </div>
+      </div>
+
+      <!-- Step 5: Subjects -->
+      <div class="onboard-step" id="onboard-step-5">
+        <div class="form-group">
+          <label class="form-label" style="font-size:15px; color:#fff;">What subjects/courses are you studying this semester?</label>
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <input type="text" class="form-input" id="onboard-custom-subject" placeholder="e.g. Distributed Systems" style="flex:1;">
+            <button type="button" class="btn-action btn-secondary" id="btn-add-subject-tag">+ Add</button>
+          </div>
+          <div id="onboard-subject-chips-list" style="display:flex; flex-wrap:wrap; gap:8px; min-height:40px; padding:8px; background:rgba(0,0,0,0.2); border-radius:10px;">
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:20px;">
+          <button type="button" class="btn-action btn-secondary" data-onboard-prev>← Back</button>
+          <button type="button" class="btn-action btn-primary" data-onboard-next>Next Step →</button>
+        </div>
+      </div>
+
+      <!-- Step 6: Target Goal -->
+      <div class="onboard-step" id="onboard-step-6">
+        <div class="form-group">
+          <label class="form-label" style="font-size:15px; color:#fff;">What is your target GPA or academic goal?</label>
+          <input type="number" step="0.01" min="2.0" max="4.0" class="form-input" id="onboard-target-gpa" value="3.90" style="font-size:16px; padding:12px;">
+          <div style="font-size:12px; color:var(--text-muted); margin-top:6px;">On a 4.00 scale (or equivalent A / 90%+ target)</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:20px;">
+          <button type="button" class="btn-action btn-secondary" data-onboard-prev>← Back</button>
+          <button type="button" class="btn-action btn-primary" data-onboard-next>Next Step →</button>
+        </div>
+      </div>
+
+      <!-- Step 7: Available Study Hours -->
+      <div class="onboard-step" id="onboard-step-7">
+        <div class="form-group">
+          <label class="form-label" style="font-size:15px; color:#fff;">Daily Available Study Hours</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div>
+              <label style="font-size:12px; color:var(--text-secondary);">Weekday (Mon-Fri)</label>
+              <input type="number" step="0.5" min="1" max="12" class="form-input" id="onboard-weekday-hours" value="4.5">
+            </div>
+            <div>
+              <label style="font-size:12px; color:var(--text-secondary);">Weekend (Sat-Sun)</label>
+              <input type="number" step="0.5" min="1" max="16" class="form-input" id="onboard-weekend-hours" value="7.0">
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:20px;">
+          <button type="button" class="btn-action btn-secondary" data-onboard-prev>← Back</button>
+          <button type="button" class="btn-action btn-primary" data-onboard-next>Next Step →</button>
+        </div>
+      </div>
+
+      <!-- Step 8: Upcoming Exam Dates -->
+      <div class="onboard-step" id="onboard-step-8">
+        <div class="form-group">
+          <label class="form-label" style="font-size:15px; color:#fff;">Upcoming Exam Dates or Key Deadlines</label>
+          <input type="text" class="form-input" id="onboard-exam-dates" placeholder="e.g. Midterm in 2 weeks, Lab Capstone on Nov 15" style="font-size:14.5px; padding:12px;">
+          <div style="font-size:12px; color:var(--text-muted); margin-top:6px;">Our AI engine will protect study buffers leading up to these dates.</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:24px;">
+          <button type="button" class="btn-action btn-secondary" data-onboard-prev>← Back</button>
+          <button type="button" class="btn-action btn-primary" id="btn-build-learning-system" style="padding:12px 24px;">
+            <span>⚡</span> Build My Learning System
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
   <!-- Application Shell -->
   <div id="app-root">
 
@@ -98,6 +361,9 @@
             </div>
           </div>
         </div>
+        <button class="btn-action btn-danger-subtle" id="btn-sidebar-logout" style="width:100%; margin-top:10px; justify-content:center; font-size:12px;">
+          <span>🚪</span> Sign Out
+        </button>
       </div>
     </aside>
 
@@ -106,6 +372,7 @@
       
       <!-- TOPBAR -->
       <header class="topbar">
+        <button class="mobile-menu-toggle" id="btn-mobile-menu" aria-label="Toggle Navigation">☰</button>
         <div class="topbar-left">
           <h1 class="page-title" id="topbar-page-title">Executive Execution Cockpit</h1>
           <div class="velocity-ticker" id="topbar-velocity-ticker">
@@ -156,43 +423,79 @@
             </div>
           </div>
 
-          <!-- KPI Metric Cards -->
+          <!-- Prominent Dashboard Action: WHAT SHOULD I STUDY NOW? -->
+          <div class="study-now-card" id="hero-study-now-card">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span style="font-size:20px;">⚡</span>
+                <strong style="color:var(--text-main); font-size:14px; letter-spacing:0.5px; text-transform:uppercase; font-family:var(--font-display);">
+                  What You Should Study Now
+                </strong>
+                <span class="cognitive-tag tag-deep-focus" id="study-now-subject">CS-301</span>
+                <span class="cognitive-tag tag-admin-review" id="study-now-priority">HIGH PRIORITY</span>
+              </div>
+              <h3 id="study-now-title" style="font-size:19px; font-weight:700; color:#fff; margin-bottom:6px;">
+                Deadlocks: Coffman Necessary Conditions & Resource Graphs
+              </h3>
+              <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;" id="study-now-reason">
+                <strong style="color:var(--primary-light);">Why:</strong> Exam in 6 days • Current mastery: 42% (Weak) • High syllabus weight • 2 recent recall misses
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+              <button class="btn-action btn-primary" id="btn-start-recommended-sprint" style="white-space:nowrap; padding:12px 24px; font-size:14.5px;">
+                <span>▶</span> Start 25-Min Sprint
+              </button>
+              <span style="font-size:11px; font-family:var(--font-mono); color:var(--text-muted);" id="study-now-duration">
+                ⏱️ 25m Calibrated Pomodoro Sprint
+              </span>
+            </div>
+          </div>
+
+          <!-- KPI Metric Cards (Transparent & Explainable) -->
           <div class="kpi-row">
-            <div class="kpi-card">
+            <div class="kpi-card" title="Projected GPA based on graded deliverables and current syllabus weights">
               <div class="kpi-icon-box kpi-icon-purple">🎓</div>
               <div class="kpi-data">
                 <div class="kpi-label">Projected GPA</div>
                 <div class="kpi-value" id="kpi-gpa-val">3.84</div>
-                <div class="kpi-trend trend-up">▲ Target: 3.92 (On Track)</div>
+                <div class="kpi-trend trend-up" id="kpi-gpa-target">▲ Target: 3.90</div>
               </div>
             </div>
 
-            <div class="kpi-card">
+            <div class="kpi-card" title="Completion Velocity = (Completed Tasks / Total Scheduled Tasks) * 100">
               <div class="kpi-icon-box kpi-icon-cyan">⚡</div>
               <div class="kpi-data">
                 <div class="kpi-label">Completion Velocity</div>
                 <div class="kpi-value" id="kpi-velocity-val">84%</div>
-                <div class="kpi-trend trend-up">▲ +12% vs. Last Week</div>
+                <div class="kpi-trend trend-up" id="kpi-velocity-trend">▲ +8% vs. prior cycle</div>
               </div>
             </div>
 
-            <div class="kpi-card">
+            <div class="kpi-card" title="Productivity & Cognitive Load Indicator (not a clinical medical diagnosis)">
               <div class="kpi-icon-box kpi-icon-emerald">🛡️</div>
               <div class="kpi-data">
                 <div class="kpi-label">Burnout Risk Index</div>
-                <div class="kpi-value" id="kpi-burnout-val" style="color:var(--emerald);">LOW</div>
-                <div class="kpi-trend">Cognitive Load Balanced</div>
+                <div class="kpi-value" id="kpi-burnout-val" style="color:var(--emerald);">LOW (28/100)</div>
+                <div class="kpi-trend" id="kpi-burnout-desc" style="font-size:11px;">Workload within safe boundary</div>
               </div>
             </div>
 
-            <div class="kpi-card">
+            <div class="kpi-card" title="Cognitive Budget = Daily study capacity minus completed workload minus scheduled load">
               <div class="kpi-icon-box kpi-icon-amber">⏱️</div>
               <div class="kpi-data">
-                <div class="kpi-label">Scheduled Load Today</div>
+                <div class="kpi-label">Cognitive Budget Today</div>
                 <div class="kpi-value" id="kpi-hours-val">2.5h / 4.5h</div>
-                <div class="kpi-trend trend-up">Safe Capacity Margin: 44%</div>
+                <div class="kpi-trend trend-up" id="kpi-capacity-margin">Safe Capacity Margin: 44%</div>
               </div>
             </div>
+          </div>
+
+          <!-- Burnout Explanation & Productivity Disclaimer Bar -->
+          <div id="burnout-explanation-bar" style="background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:10px; padding:10px 16px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+            <div style="color:var(--text-secondary);">
+              <span id="burnout-reason-text">Cognitive workload is well-balanced within your daily capacity.</span>
+            </div>
+            <span style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">Productivity Indicator • Non-Clinical</span>
           </div>
 
           <!-- Overdue Triage Alert Banner -->
@@ -466,8 +769,8 @@
           
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:28px;">
             
-            <!-- Left: 3D Leitner Spaced-Repetition Flip Cards -->
-            <div class="card-3d">
+            <!-- Left: 3D Active Recall Spaced-Repetition Deck -->
+            <div class="card-3d" id="active-recall-container">
               <div class="card-glare"></div>
 
               <div class="section-header-row">
@@ -477,9 +780,40 @@
                     Card 1 of 4
                   </div>
                 </div>
-                <select class="form-select" id="study-deck-select" style="width:auto; padding:6px 12px; font-size:12px;">
-                  <!-- Populated by app.js -->
-                </select>
+                <div style="display:flex; gap:8px;">
+                  <select class="form-select" id="study-deck-select" style="width:auto; padding:6px 12px; font-size:12px;">
+                    <!-- Populated by app.js -->
+                  </select>
+                  <button class="btn-action btn-secondary" id="btn-generate-ai-deck" style="padding:6px 12px; font-size:12px;" title="Generate new conceptual flashcards with Gemini">
+                    <span>✨</span> + AI Deck
+                  </button>
+                </div>
+              </div>
+
+              <!-- Loading Skeleton State (hidden by default) -->
+              <div id="flashcard-loading-state" style="display:none; padding:50px 20px; text-align:center;">
+                <div class="auth-spinner" style="width:30px; height:30px; border-width:3px; margin-bottom:12px;"></div>
+                <div style="font-size:14px; color:#fff; font-weight:600;">Gemini is synthesizing high-yield conceptual flashcards...</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Extracting mechanisms, tradeoffs, and grading rubrics</div>
+              </div>
+
+              <!-- Error State (hidden by default) -->
+              <div id="flashcard-error-state" style="display:none; padding:40px 20px; text-align:center;">
+                <div style="font-size:32px; margin-bottom:10px;">⚠️</div>
+                <div style="color:var(--rose); font-weight:600; font-size:14px;" id="flashcard-error-text">Active Recall generation failed.</div>
+                <button class="btn-action btn-secondary" id="btn-retry-flashcard" style="margin-top:14px; font-size:12px;">
+                  <span>🔄</span> Retry Generation
+                </button>
+              </div>
+
+              <!-- Empty State (hidden by default) -->
+              <div id="flashcard-empty-state" style="display:none; padding:50px 20px; text-align:center;">
+                <div style="font-size:36px; margin-bottom:12px;">📭</div>
+                <h4 style="font-size:16px; color:#fff; margin-bottom:6px;">No Active Recall Cards in this Deck</h4>
+                <p style="font-size:13px; color:var(--text-secondary); max-width:320px; margin:0 auto 16px;">Generate conceptual active recall flashcards grounded in your course syllabus.</p>
+                <button class="btn-action btn-primary" id="btn-empty-generate-deck" style="font-size:13px;">
+                  <span>✨</span> Generate Flashcards with AI
+                </button>
               </div>
 
               <!-- 3D Flip Card Stage -->
@@ -489,14 +823,19 @@
                   <!-- Front Face -->
                   <div class="card-face card-face-front">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span class="card-tag-pill" id="deck-title-display">CS-410 Distributed Systems</span>
-                      <span style="font-size:12px; color:var(--primary-light);">FRONT</span>
+                      <span class="card-tag-pill" id="deck-title-display">CS-301 Operating Systems</span>
+                      <span style="font-size:11px; font-family:var(--font-mono); color:var(--primary-light);">QUESTION • FRONT</span>
                     </div>
-                    <div class="card-main-text" id="card-front-question">
-                      Loading Question...
+                    <div class="card-main-text" id="card-front-question" style="font-size:16.5px; line-height:1.55;">
+                      What are the four necessary and sufficient conditions for deadlock to occur in an operating system?
                     </div>
-                    <div class="card-flip-prompt">
-                      <span>🔄</span> Click anywhere or press Space to flip 3D card
+                    <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                      <span class="card-flip-prompt" style="font-size:11.5px;">
+                        <span>🔄</span> Click or press Space to reveal answer
+                      </span>
+                      <button type="button" class="btn-action btn-primary" id="btn-reveal-answer-front" style="padding:6px 14px; font-size:12px;">
+                        Reveal Answer ➔
+                      </button>
                     </div>
                   </div>
 
@@ -504,57 +843,152 @@
                   <div class="card-face card-face-back">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                       <span class="card-tag-pill" style="color:var(--cyan);">ANSWER & RUBRIC</span>
-                      <span style="font-size:12px; color:var(--cyan);">BACK</span>
+                      <span style="font-size:11px; font-family:var(--font-mono); color:var(--cyan);">VERIFIED • BACK</span>
                     </div>
-                    <div class="card-main-text" id="card-back-answer" style="font-size:17px;">
-                      Loading Answer...
+                    <div class="card-main-text" id="card-back-answer" style="font-size:15.5px; line-height:1.5; white-space:pre-line;">
+                      1. Mutual Exclusion
+                      2. Hold and Wait
+                      3. No Preemption
+                      4. Circular Wait
                     </div>
-                    <div class="card-explanation" id="card-back-explanation"></div>
-                    <div class="card-flip-prompt" style="color:var(--cyan);">
-                      <span>✓</span> Rate recall confidence below
+                    <div class="card-explanation" id="card-back-explanation" style="font-size:12px; color:var(--text-secondary); max-height:80px; overflow-y:auto;">
+                      Coffman conditions: Deadlock occurs if and only if all four conditions hold simultaneously. Breaking any one condition guarantees deadlock prevention.
+                    </div>
+                    <div style="font-size:11px; color:var(--cyan); font-family:var(--font-mono); text-align:center;">
+                      Evaluate your recall below to update your skill profile
                     </div>
                   </div>
 
                 </div>
               </div>
 
-              <!-- Leitner Rating Bar -->
-              <div class="leitner-rating-bar">
-                <button class="btn-leitner btn-leitner-again" data-leitner="1">
-                  Again <span>(1)</span>
-                </button>
-                <button class="btn-leitner btn-leitner-hard" data-leitner="2">
-                  Hard <span>(2)</span>
-                </button>
-                <button class="btn-leitner btn-leitner-good" data-leitner="3">
-                  Good <span>(3)</span>
-                </button>
-                <button class="btn-leitner btn-leitner-easy" data-leitner="4">
-                  Easy <span>(4)</span>
-                </button>
+              <!-- Confidence Rating & Self-Evaluation Controls -->
+              <div id="flashcard-evaluation-controls" style="margin-top:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:12px; color:var(--text-muted); font-family:var(--font-mono);">
+                    HOW CONFIDENT WERE YOU?
+                  </span>
+                  <span style="font-size:11px; color:var(--text-secondary);" id="confidence-label">Rating: 3 (Moderate)</span>
+                </div>
+                
+                <div class="confidence-rating-bar">
+                  <button type="button" class="btn-confidence" data-confidence="1">1 (None)</button>
+                  <button type="button" class="btn-confidence" data-confidence="2">2 (Low)</button>
+                  <button type="button" class="btn-confidence selected" data-confidence="3">3 (Fair)</button>
+                  <button type="button" class="btn-confidence" data-confidence="4">4 (High)</button>
+                  <button type="button" class="btn-confidence" data-confidence="5">5 (Mastered)</button>
+                </div>
+
+                <div class="self-evaluation-row">
+                  <button type="button" class="btn-eval btn-eval-fail" data-eval="DID_NOT_KNOW">
+                    <span>❌ I Didn't Know</span>
+                    <span style="font-size:10px; opacity:0.8;">Schedule revision</span>
+                  </button>
+                  <button type="button" class="btn-eval btn-eval-partial" data-eval="PARTIALLY">
+                    <span>⚠️ Partially</span>
+                    <span style="font-size:10px; opacity:0.8;">Review in 2 days</span>
+                  </button>
+                  <button type="button" class="btn-eval btn-eval-know" data-eval="KNEW_IT">
+                    <span>✅ I Knew It</span>
+                    <span style="font-size:10px; opacity:0.8;">Calibrate mastery +1</span>
+                  </button>
+                </div>
               </div>
 
             </div>
 
-            <!-- Right: Diagnostic Quiz Runner -->
+            <!-- Right: Diagnostic Self-Test & Skill Map -->
             <div class="card-3d" id="quiz-runner-box">
               <div class="card-glare"></div>
 
               <div class="section-header-row">
-                <h3 class="section-heading"><span>🎯</span> Diagnostic Self-Test</h3>
-                <span class="cognitive-tag tag-active-production" id="quiz-question-count">Question 1 of 5</span>
+                <div>
+                  <h3 class="section-heading"><span>🎯</span> Diagnostic Self-Test</h3>
+                  <div style="font-size:12px; color:var(--text-muted); font-family:var(--font-mono);">
+                    Adaptive knowledge verification & skill mapping
+                  </div>
+                </div>
+                <span class="cognitive-tag tag-active-production" id="quiz-question-count">Assessment Ready</span>
               </div>
 
-              <div style="margin-bottom:20px;">
-                <p id="quiz-question-text" style="font-size:15px; line-height:1.55; color:#fff; font-weight:500;">
-                  Loading diagnostic question...
+              <!-- Diagnostic Setup / Launch State -->
+              <div id="quiz-setup-state" style="padding:10px 0;">
+                <p style="font-size:13.5px; color:var(--text-secondary); margin-bottom:16px; line-height:1.5;">
+                  Take a 5-question diagnostic assessment based on your active syllabus to map topic strengths and uncover hidden knowledge gaps.
                 </p>
+
+                <div class="form-group">
+                  <label class="form-label">Select Subject to Test</label>
+                  <select class="form-select" id="quiz-subject-select">
+                    <!-- Populated by app.js from enrolled courses -->
+                  </select>
+                </div>
+
+                <button class="btn-action btn-primary" id="btn-start-diagnostic" style="width:100%; justify-content:center; padding:12px; font-size:14.5px;">
+                  <span>🎯</span> Start Diagnostic Assessment
+                </button>
               </div>
 
-              <div class="prompt-chips-wrapper" id="quiz-options-list">
-                <!-- Populated by app.js -->
+              <!-- Diagnostic Loading State -->
+              <div id="quiz-loading-state" style="display:none; padding:50px 20px; text-align:center;">
+                <div class="auth-spinner" style="width:32px; height:32px; border-width:3px; margin-bottom:12px;"></div>
+                <div style="font-size:14px; color:#fff; font-weight:600;">Generating diagnostic questions with Gemini...</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Calibrating question difficulty to your course curriculum</div>
               </div>
+
+              <!-- Diagnostic Active Question State -->
+              <div id="quiz-active-state" style="display:none;">
+                <div style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+                  <span class="cognitive-tag tag-deep-focus" id="quiz-topic-pill">Topic: Deadlocks</span>
+                  <span style="font-size:12px; font-family:var(--font-mono); color:var(--text-secondary);" id="quiz-score-live">Score: 0 / 0</span>
+                </div>
+
+                <div style="margin-bottom:20px;">
+                  <p id="quiz-question-text" style="font-size:15.5px; line-height:1.55; color:#fff; font-weight:500;">
+                    <!-- Question injected by app.js -->
+                  </p>
+                </div>
+
+                <div class="prompt-chips-wrapper" id="quiz-options-list" style="display:flex; flex-direction:column; gap:10px;">
+                  <!-- Options populated by app.js -->
+                </div>
+
+                <div id="quiz-feedback-box" style="display:none; margin-top:16px; padding:12px 16px; border-radius:10px; font-size:13px; line-height:1.45;"></div>
+              </div>
+
+              <!-- Diagnostic Complete & Skill Map State -->
+              <div id="quiz-complete-state" style="display:none; padding:10px 0;">
+                <div style="text-align:center; margin-bottom:18px;">
+                  <div style="font-size:36px; margin-bottom:6px;">🏆</div>
+                  <h4 style="font-size:19px; font-weight:700; color:#fff;">Diagnostic Complete</h4>
+                  <div style="font-size:14px; color:var(--text-secondary);">
+                    Final Score: <strong style="color:var(--emerald); font-size:18px;" id="quiz-final-score">4 / 5 (80%)</strong>
+                  </div>
+                </div>
+
+                <div style="font-size:12px; font-family:var(--font-mono); color:var(--text-muted); margin-bottom:8px; text-transform:uppercase;">
+                  Topic-Level Skill Map Calibrated:
+                </div>
+
+                <div class="skill-map-grid" id="quiz-skill-map-display">
+                  <!-- Skill map items injected by app.js -->
+                </div>
+
+                <div style="margin-top:24px; display:flex; gap:10px;">
+                  <button class="btn-action btn-secondary" id="btn-restart-quiz" style="flex:1; justify-content:center;">
+                    <span>🔄</span> Retest
+                  </button>
+                  <button class="btn-action btn-primary" id="btn-adapt-study-plan" style="flex:1.6; justify-content:center;">
+                    <span>⚡</span> Adapt Study Plan
+                  </button>
+                </div>
+              </div>
+
             </div>
+
+          </div>
+
+        </section>
 
           </div>
 
@@ -728,6 +1162,7 @@
   <script src="js/supabase.js"></script>
   <script src="js/store.js"></script>
   <script src="js/advisor.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

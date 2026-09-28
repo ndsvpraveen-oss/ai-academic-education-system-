@@ -1,6 +1,7 @@
 /**
- * ACADEMIQ OS: AEGIS AI ACADEMIC ADVISOR & RUBRIC AUDITOR
- * Context-grounded advisory intelligence with syllabus retrieval & Socratic coaching.
+ * ACADEMIQ OS: AEGIS AI ACADEMIC ADVISOR & SOCRATIC COPILOT
+ * Context-grounded advisory intelligence with real Gemini API integration,
+ * live telemetry synchronization, and syllabus/performance auditing.
  */
 
 class AegisAdvisor {
@@ -8,9 +9,10 @@ class AegisAdvisor {
     this.conversation = [
       {
         sender: 'assistant',
-        text: `Greetings, Scholar. I am **Aegis**, your Academic Execution Copilot. 
+        text: `### 🛡️ Aegis Academic Copilot Initialized
+Greetings, Scholar. I am synchronized with your active courses, current skill map, and cognitive workload telemetry.
 
-I am currently synchronized with your active syllabi (*CS-410*, *BIO-302*, *ECON-201*) and your daily cognitive capacity. How can we optimize your execution velocity today?`,
+Ask me anything about your syllabi, why you might be struggling with a topic, or how to triage your upcoming sprint schedule.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ];
@@ -35,95 +37,94 @@ I am currently synchronized with your active syllabi (*CS-410*, *BIO-302*, *ECON
 
     if (window.academiqAudio) window.academiqAudio.playClick();
 
-    // Generate intelligent grounded response
-    const replyText = await this.generateAdvisorResponse(userMessage);
-
-    // Realistic typing latency
-    setTimeout(() => {
+    // Call live AI backend
+    try {
+      const replyText = await this.generateAdvisorResponse(userMessage);
       this.conversation.push({
         sender: 'assistant',
         text: replyText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
+    } catch (err) {
+      console.error("Aegis generation error:", err);
+      this.conversation.push({
+        sender: 'assistant',
+        text: `⚠️ **AI generation failed. Please retry.**\n\n_${err.message || 'Unable to establish secure handshake with Gemini cognitive gateway.'}_\n\n<button class="btn-action btn-secondary" style="font-size:12px; margin-top:8px;" onclick="window.aegisAdvisor.retryLastMessage()">🔄 Retry Query</button>`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+    } finally {
       this.isTyping = false;
       callback(this.conversation, false);
       if (window.academiqAudio) window.academiqAudio.playClick();
-    }, 700);
+    }
+  }
+
+  retryLastMessage() {
+    const lastUserMsg = [...this.conversation].reverse().find(m => m.sender === 'user');
+    if (lastUserMsg) {
+      const chatInput = document.getElementById('advisor-input-field');
+      if (chatInput) chatInput.value = lastUserMsg.text;
+      const sendBtn = document.getElementById('advisor-send-btn');
+      if (sendBtn) sendBtn.click();
+    }
   }
 
   async generateAdvisorResponse(query) {
-    const q = query.toLowerCase();
     const store = window.academiqStore;
+    const state = store.state;
     const analytics = store.getAnalytics();
-    const courses = store.state.courses;
 
-    // Check for late policy questions
-    if (q.includes('late') || q.includes('penalty') || q.includes('deadline')) {
-      return `### 📋 Grounded Syllabus Policy Audit:
+    // Gather authentic student context
+    const weakTopics = Object.keys(state.skillMap || {}).filter(k => state.skillMap[k].status === 'Weak');
+    
+    // Calculate recent recall accuracy
+    let totalRecallAttempts = 0;
+    let successfulRecallAttempts = 0;
+    (state.studyDecks || []).forEach(d => {
+      (d.cards || []).forEach(c => {
+        if (c.lastConfidence != null) {
+          totalRecallAttempts++;
+          if (c.lastConfidence >= 3) successfulRecallAttempts++;
+        }
+      });
+    });
+    const recallAccuracy = totalRecallAttempts > 0 ? Math.round((successfulRecallAttempts / totalRecallAttempts) * 100) : 40;
 
-According to **Prof. Kleppmann's CS-410 Syllabus**:
-- **Late Penalty:** Exactly **10% is deducted for each 24-hour increment** past the deadline.
-- **Hard Cutoff:** Submissions past **72 hours** will receive an automatic grade of **0%**.
+    const contextPayload = {
+      profile: state.profile,
+      courses: state.courses,
+      skillMap: state.skillMap,
+      recentPerformance: {
+        recallAccuracy,
+        weakTopics,
+        diagnosticScore: state.diagnosticHistory?.length > 0 ? `${state.diagnosticHistory[state.diagnosticHistory.length - 1].score}/${state.diagnosticHistory[state.diagnosticHistory.length - 1].totalQuestions}` : null
+      },
+      tasks: state.executionTasks,
+      milestones: state.milestones,
+      analytics
+    };
 
-⚡ **Tactical Recommendation:** Your **Pset 1** is due in 3 days. If you find yourself in danger of missing it, you should execute the **Surgical Compression** rebalance now rather than incurring the 10% penalty.`;
+    const resp = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'chat',
+        message: query,
+        context: contextPayload
+      })
+    });
+
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.error || `Server responded with status ${resp.status}`);
     }
 
-    // Check for essay or rubric audit
-    if (q.includes('audit') || q.includes('essay') || q.includes('paper') || q.includes('rubric') || q.includes('thesis')) {
-      return `### 🔍 Aegis Rubric Compliance Audit:
-
-**Target Deliverable:** *BIO-302 Research Term Paper (Weight: 25%)*
-**Rubric Evaluation Criteria:**
-
-1. **Mechanistic Rigor (Score: 9/10):**
-   - Excellent integration of NMDA-mediated Ca2+ influx and CaMKII autophosphorylation.
-2. **Experimental Causality (Score: 8/10):**
-   - *Recommendation:* Explicitly contrast pharmacological receptor blockade (APV) against optogenetic silencing to strengthen causal claims.
-3. **Citation & Synthesis (Score: 10/10):**
-   - Seamless alignment with Kandel & Dulac lab literature benchmarks.
-
-**Predicted Grade Bracket:** **92% - 95% (High A)**. Ready for micro-sprint phase 4 drafting!`;
+    const data = await resp.json();
+    if (!data.reply) {
+      throw new Error("Received empty advisory reply from AI engine.");
     }
 
-    // Check for schedule / burnout / triage advice
-    if (q.includes('burnout') || q.includes('overwhelmed') || q.includes('behind') || q.includes('rebalance') || q.includes('schedule')) {
-      return `### 🛡️ Cognitive Load Triage Advisory:
-
-- **Current Completion Velocity:** **${analytics.completionVelocity}%**
-- **Scheduled Today:** **${analytics.totalScheduledHours} hours** (Safe limit: ${analytics.userCapacityHours}h)
-- **Burnout Risk:** **${analytics.burnoutRisk}**
-
-**Action Plan:**
-You currently have **${analytics.overdueTasksCount} overdue micro-sprint(s)**. 
-1. Use the **Emergency Triage** feature to automatically archive low-yield administrative tasks.
-2. Commit to just **ONE 25-minute Pomodoro session** on your *Raft Leader Election* module right now. Once kinetic momentum is established, resistance will drop by 70%.`;
-    }
-
-    // Check for Raft or CS410 technical advice
-    if (q.includes('raft') || q.includes('consensus') || q.includes('paxos') || q.includes('go')) {
-      return `### ⚡ Socratic Technical Coaching: Raft Leader Election
-
-To guarantee safety in **CS-410 Pset 1**, ensure:
-1. **Election Timers:** Randomize between **150ms and 300ms** to avoid split-vote ties.
-2. **Quorum Verification:** A candidate can only transition to leader if it gathers votes from a strict majority: $\\lfloor N/2 \\rfloor + 1$.
-3. **Log Matching Property:** If two logs contain an entry with the same index and term, the logs are identical up to that index.
-
-Would you like me to generate a 3-question diagnostic quiz on Raft state transitions?`;
-    }
-
-    // Default academic advisor coaching response
-    return `### 🎯 Strategic Execution Guidance:
-
-I have analyzed your current academic trajectory:
-- **Projected GPA:** **${analytics.projectedGpa}** (Target: ${analytics.targetGpa})
-- **Active Deliverables:** **${analytics.imminentMilestones} high-stakes milestones** upcoming across 3 courses.
-
-To maximize your retention and output:
-1. Complete your scheduled **Deep Focus** task (*CS-410 Go State Machine*) before 2:00 PM.
-2. Follow up with your **Active Production** electrophysiology data filtering.
-3. Review your **Spaced-Repetition Flashcards** tonight before sleep to stimulate memory consolidation.
-
-Let me know if you would like me to break down any complex deliverable into micro-sprints!`;
+    return data.reply;
   }
 }
 

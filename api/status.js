@@ -14,7 +14,7 @@ module.exports = (req, res) => {
     status: 'online',
     system: 'Academiq OS Core 2.5',
     timestamp: new Date().toISOString(),
-    aiEngine: process.env.GEMINI_API_KEY ? 'gemini-2.5-pro' : 'simulation-mode',
+    aiEngine: process.env.GEMINI_API_KEY ? 'gemini-flash-active' : 'simulation-mode',
     database: process.env.SUPABASE_URL ? 'supabase-connected' : 'local-storage',
     supabaseRef: 'rdfuhgnhvdkexpcveros'
   }));

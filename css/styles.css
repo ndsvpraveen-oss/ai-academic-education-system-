@@ -1603,7 +1603,420 @@ html, body {
 }
 
 @media (max-width: 768px) {
-  .sidebar { width: 70px; }
-  .sidebar .brand-title, .sidebar .nav-link span, .sidebar .nav-section-label, .sidebar-footer { display: none; }
-  .kpi-row { grid-template-columns: 1fr; }
+  .sidebar {
+    transform: translateX(-100%);
+    position: fixed;
+    z-index: 1000;
+    transition: transform var(--transition-smooth);
+    width: 260px !important;
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .sidebar .brand-title, .sidebar .nav-link span, .sidebar .nav-section-label, .sidebar-footer { display: flex !important; }
+  .main-wrapper { margin-left: 0 !important; width: 100% !important; padding: 16px !important; }
+  .topbar { padding: 12px 16px !important; }
+  .kpi-row { grid-template-columns: 1fr !important; }
+  .mobile-menu-toggle { display: flex !important; }
 }
+
+/* Mobile Menu Toggle Button */
+.mobile-menu-toggle {
+  display: none;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   AUTHENTICATION & ONBOARDING SYSTEM
+   ========================================================================== */
+
+#auth-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 30%, rgba(139, 92, 246, 0.15) 0%, rgba(5, 7, 14, 0.95) 70%);
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.auth-card-view {
+  display: none;
+  width: 100%;
+  max-width: 480px;
+  background: rgba(14, 20, 36, 0.88);
+  border: 1px solid var(--glass-border-bright);
+  box-shadow: var(--shadow-3d-lg);
+  border-radius: 20px;
+  padding: 36px;
+  position: relative;
+  animation: authFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-card-view.active {
+  display: block;
+}
+
+@keyframes authFadeIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-brand-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: 1px solid var(--primary-glow);
+  box-shadow: var(--shadow-glow);
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.auth-brand-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.auth-error-banner {
+  display: none;
+  background: rgba(244, 63, 94, 0.14);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  color: #fca5a5;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 18px;
+  line-height: 1.45;
+}
+
+.auth-success-banner {
+  display: none;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 18px;
+  line-height: 1.45;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 18px 0;
+}
+
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.auth-divider span {
+  padding: 0 10px;
+}
+
+.auth-footer-links {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.auth-footer-links a {
+  color: var(--primary-light);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.auth-footer-links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.auth-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.7s linear infinite;
+  margin-right: 6px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Onboarding Wizard Specifics */
+.onboard-container {
+  max-width: 600px !important;
+}
+
+.onboard-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.onboard-progress-fill {
+  height: 100%;
+  background: var(--primary-gradient);
+  width: 12.5%;
+  transition: width 0.3s ease;
+}
+
+.onboard-step {
+  display: none;
+}
+
+.onboard-step.active {
+  display: block;
+  animation: authFadeIn 0.3s ease;
+}
+
+.subject-chip-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(139, 92, 246, 0.16);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: var(--primary-light);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.chip-remove-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.chip-remove-btn:hover {
+  color: var(--rose);
+}
+
+/* ==========================================================================
+   ACTIVE RECALL EVALUATION & CONFIDENCE BARS
+   ========================================================================== */
+
+.confidence-rating-bar {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.btn-confidence {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 8px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all var(--transition-fast);
+}
+
+.btn-confidence:hover, .btn-confidence.selected {
+  background: var(--primary-gradient);
+  color: #fff;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.self-evaluation-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn-eval {
+  padding: 10px 8px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+}
+
+.btn-eval-know {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--emerald);
+}
+.btn-eval-know:hover {
+  background: var(--emerald);
+  color: #fff;
+}
+
+.btn-eval-partial {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: var(--amber);
+}
+.btn-eval-partial:hover {
+  background: var(--amber);
+  color: #000;
+}
+
+.btn-eval-fail {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: var(--rose);
+}
+.btn-eval-fail:hover {
+  background: var(--rose);
+  color: #fff;
+}
+
+/* ==========================================================================
+   SKILL MAP VISUALIZATION
+   ========================================================================== */
+
+.skill-map-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.skill-map-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skill-map-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skill-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
+.skill-badge-strong {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--emerald);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.skill-badge-medium {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--amber);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.skill-badge-weak {
+  background: rgba(244, 63, 94, 0.2);
+  color: var(--rose);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+}
+
+.skill-progress-bar {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.skill-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+/* Hero "⚡ WHAT SHOULD I STUDY NOW?" Card */
+.study-now-card {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.16) 0%, rgba(6, 182, 212, 0.12) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.2);
+}
+
+@media (max-width: 768px) {
+  .study-now-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+

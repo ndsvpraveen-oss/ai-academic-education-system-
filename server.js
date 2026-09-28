@@ -100,6 +100,11 @@ const server = http.createServer((req, res) => {
       return;
     }
 
+    if (pathname === '/api/ai') {
+      const aiHandler = require('./api/ai.js');
+      return aiHandler(req, res);
+    }
+
     res.writeHead(404);
     res.end(JSON.stringify({ error: 'Endpoint not found' }));
     return;
