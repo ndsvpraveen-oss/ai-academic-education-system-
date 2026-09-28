@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academiq OS | 3D AI Academic Execution & Cognitive Roadmap System</title>
+  <meta name="description" content="Production-grade AI Academic Execution Platform. Transforming passive syllabi into dynamic, self-rebalancing 3D micro-sprint roadmaps.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/jpeg" href="assets/app_icon.jpg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Core 3D Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Three.js CDN for 3D Visual Core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Supabase Cloud SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- WebGL 3D Holographic Canvas -->
+  <div id="webgl-canvas-container"></div>
+  
+  <!-- Cyber Background Overlays -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+  <div class="cyber-grid-overlay"></div>
+
+  <!-- Application Shell -->
+  <div id="app-root">
+
+    <!-- 1. SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon-wrapper">
+          <img src="assets/app_icon.jpg" alt="Academiq Logo">
+        </div>
+        <div>
+          <div class="brand-title">
+            ACADEMIQ <span class="brand-badge">3D OS</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">v2.5 CORE ENGINE</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Execution Hub</div>
+        <a class="nav-link active" data-view="dashboard">
+          <span>⚡</span>
+          <span>Dashboard</span>
+          <span class="badge-counter" id="nav-task-count">5</span>
+        </a>
+        <a class="nav-link" data-view="roadmap">
+          <span>🗺️</span>
+          <span>Master Roadmap</span>
+        </a>
+        <a class="nav-link" data-view="pomodoro">
+          <span>🎯</span>
+          <span>3D Focus Cockpit</span>
+        </a>
+
+        <div class="nav-section-label">Intelligence & AI</div>
+        <a class="nav-link" data-view="ingestion">
+          <span>📄</span>
+          <span>Syllabus Ingestion</span>
+        </a>
+        <a class="nav-link" data-view="advisor">
+          <span>✨</span>
+          <span>Aegis AI Advisor</span>
+        </a>
+        <a class="nav-link" data-view="study">
+          <span>🧠</span>
+          <span>3D Active Recall</span>
+        </a>
+
+        <div class="nav-section-label">System</div>
+        <a class="nav-link" data-view="settings">
+          <span>⚙️</span>
+          <span>Capacity & Habits</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-status-card">
+          <div class="user-avatar">AV</div>
+          <div class="user-info">
+            <div class="user-name">Alex Vance</div>
+            <div class="user-meta">
+              <span class="status-dot-active"></span>
+              <span>Stanford / MIT EECS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN WRAPPER -->
+    <div class="main-wrapper">
+      
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title" id="topbar-page-title">Executive Execution Cockpit</h1>
+          <div class="velocity-ticker" id="topbar-velocity-ticker">
+            VELOCITY: 84% | BURNOUT: LOW
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn-action btn-danger-subtle" id="trigger-rebalance-modal">
+            <span>🛡️</span> Run Triage Rebalance
+          </button>
+          <button class="btn-action btn-secondary" data-goto="pomodoro">
+            <span>⏱️</span> Quick Focus
+          </button>
+          <button class="btn-action btn-primary" data-goto="ingestion">
+            <span>+</span> Ingest Syllabus
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT BODY -->
+      <main class="content-body">
+
+        <!-- ==========================================
+             VIEW 1: EXECUTIVE DASHBOARD
+             ========================================== -->
+        <section class="view-section active" id="view-dashboard">
+
+          <!-- Hero Banner -->
+          <div class="hero-banner-card">
+            <img src="assets/hero_banner.jpg" alt="Academiq Execution Hologram" class="hero-banner-img">
+            <div class="hero-banner-gradient"></div>
+            <div class="hero-banner-content">
+              <div class="hero-badge-tag">
+                <span>✦</span> GEMINI 2.5 COGNITIVE EXECUTION ENGINE
+              </div>
+              <h2 class="hero-title">Close the Academic Execution Gap.</h2>
+              <p class="hero-desc">
+                Your static syllabi have been synthesized into self-rebalancing daily micro-sprints. Stay ahead of deadlines with zero cognitive overwhelm.
+              </p>
+              <div style="display:flex; gap:12px;">
+                <button class="btn-action btn-primary" data-goto="pomodoro">
+                  <span>▶</span> Launch Today's First Sprint
+                </button>
+                <button class="btn-action btn-secondary" data-goto="roadmap">
+                  <span>🗺️</span> View Gantt Timeline
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI Metric Cards -->
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-purple">🎓</div>
+              <div class="kpi-data">
+                <div class="kpi-label">Projected GPA</div>
+                <div class="kpi-value" id="kpi-gpa-val">3.84</div>
+                <div class="kpi-trend trend-up">▲ Target: 3.92 (On Track)</div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-cyan">⚡</div>
+              <div class="kpi-data">
+                <div class="kpi-label">Completion Velocity</div>
+                <div class="kpi-value" id="kpi-velocity-val">84%</div>
+                <div class="kpi-trend trend-up">▲ +12% vs. Last Week</div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-emerald">🛡️</div>
+              <div class="kpi-data">
+                <div class="kpi-label">Burnout Risk Index</div>
+                <div class="kpi-value" id="kpi-burnout-val" style="color:var(--emerald);">LOW</div>
+                <div class="kpi-trend">Cognitive Load Balanced</div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-amber">⏱️</div>
+              <div class="kpi-data">
+                <div class="kpi-label">Scheduled Load Today</div>
+                <div class="kpi-value" id="kpi-hours-val">2.5h / 4.5h</div>
+                <div class="kpi-trend trend-up">Safe Capacity Margin: 44%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Overdue Triage Alert Banner -->
+          <div id="dashboard-overdue-alert" style="display:none; background:rgba(244,63,94,0.12); border:1px solid rgba(244,63,94,0.35); border-radius:14px; padding:16px 20px; margin-bottom:24px; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="font-size:22px;">⚠️</span>
+              <div>
+                <strong style="color:var(--rose);" id="overdue-count-text">1 overdue micro-sprint detected</strong>
+                <div style="font-size:12.5px; color:#cbd5e1;">Your schedule requires automated rebalancing to protect upcoming exam review buffers.</div>
+              </div>
+            </div>
+            <button class="btn-action btn-danger-subtle" onclick="document.getElementById('modal-rebalance').classList.add('open')">
+              Execute Triage →
+            </button>
+          </div>
+
+          <!-- Dashboard Grid -->
+          <div class="dashboard-grid">
+            
+            <!-- Left: Today's Action Queue (7 cols) -->
+            <div class="col-7">
+              <div class="card-3d">
+                <div class="card-glare"></div>
+                <div class="section-header-row">
+                  <h3 class="section-heading">
+                    <span>⚡</span> Today's Micro-Sprint Queue
+                  </h3>
+                  <span style="font-size:12px; color:var(--text-muted); font-family:var(--font-mono);">
+                    Focus blocks calibrated to 25m Pomodoros
+                  </span>
+                </div>
+                <div class="task-list-queue" id="today-task-queue">
+                  <!-- Populated by app.js -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: 3D Mini Cockpit & Course Health (5 cols) -->
+            <div class="col-5" style="display:flex; flex-direction:column; gap:24px;">
+              
+              <!-- Mini Pomodoro Preview -->
+              <div class="card-3d" style="text-align:center;">
+                <div class="card-glare"></div>
+                <div class="section-header-row" style="margin-bottom:8px;">
+                  <h3 class="section-heading" style="font-size:15px;">
+                    <span>🎯</span> Active Focus Sphere
+                  </h3>
+                  <button class="btn-icon" data-goto="pomodoro" title="Open Full 3D Cockpit">↗</button>
+                </div>
+                
+                <div class="pomodoro-container-3d" style="padding:10px 0;">
+                  <div class="gyro-stage" style="width:180px; height:180px; margin-bottom:12px;">
+                    <div class="gyro-ring ring-outer" style="width:170px; height:170px; margin-top:-85px; margin-left:-85px;"></div>
+                    <div class="gyro-ring ring-middle" style="width:140px; height:140px; margin-top:-70px; margin-left:-70px;"></div>
+                    <div class="timer-core-display">
+                      <div class="timer-numbers" style="font-size:36px;">25:00</div>
+                      <div class="timer-mode-label" style="font-size:10px;">DEEP FOCUS</div>
+                    </div>
+                  </div>
+                  <div style="font-size:12.5px; color:var(--text-secondary); margin-bottom:12px;">
+                    Next Sprint: <strong>Raft Leader Election in Go</strong>
+                  </div>
+                  <button class="btn-action btn-primary" data-goto="pomodoro" style="width:100%; justify-content:center;">
+                    Enter Distraction-Free Cockpit
+                  </button>
+                </div>
+              </div>
+
+              <!-- Active Course Cards -->
+              <div>
+                <div class="section-header-row">
+                  <h3 class="section-heading" style="font-size:16px;">
+                    <span>📚</span> Active Course Health
+                  </h3>
+                  <button class="btn-action btn-secondary" style="padding:5px 12px; font-size:12px;" data-goto="ingestion">+ Ingest</button>
+                </div>
+                <div id="dashboard-courses-grid" style="display:flex; flex-direction:column; gap:12px;">
+                  <!-- Populated by app.js -->
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==========================================
+             VIEW 2: MASTER ROADMAP & KANBAN
+             ========================================== -->
+        <section class="view-section" id="view-roadmap">
+          
+          <div class="section-header-row" style="margin-bottom:24px;">
+            <div>
+              <h2 style="font-size:22px; font-weight:700; color:#fff;">Chronological Execution Gantt & Micro-Sprint Kanban</h2>
+              <p style="color:var(--text-secondary); font-size:13.5px;">All course milestones broken down into sequenced cognitive micro-actions.</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn-action btn-secondary" onclick="document.getElementById('modal-rebalance').classList.add('open')">
+                <span>🛡️</span> Rebalance Schedule
+              </button>
+            </div>
+          </div>
+
+          <!-- Gantt Timeline Overview -->
+          <div class="card-3d" style="margin-bottom:28px;">
+            <div class="card-glare"></div>
+            <h3 class="section-heading" style="margin-bottom:16px;">
+              <span>📊</span> Semester Milestone Horizon
+            </h3>
+            <div class="gantt-container" id="gantt-tracks-container">
+              <!-- Populated by app.js -->
+            </div>
+          </div>
+
+          <!-- 3D Kanban Columns -->
+          <div class="kanban-board-grid">
+            
+            <div class="kanban-column">
+              <div class="kanban-col-header">
+                <div class="kanban-col-title" style="color:var(--text-secondary);">
+                  <span>⏳</span> PENDING SPRINTS
+                </div>
+                <span class="badge-counter">Pending</span>
+              </div>
+              <div class="kanban-cards-stack" id="kanban-pending-stack"></div>
+            </div>
+
+            <div class="kanban-column">
+              <div class="kanban-col-header">
+                <div class="kanban-col-title" style="color:var(--cyan);">
+                  <span>▶</span> IN FOCUS SPRINT
+                </div>
+                <span class="badge-counter" style="background:var(--cyan); color:#000;">Active</span>
+              </div>
+              <div class="kanban-cards-stack" id="kanban-progress-stack"></div>
+            </div>
+
+            <div class="kanban-column">
+              <div class="kanban-col-header">
+                <div class="kanban-col-title" style="color:var(--emerald);">
+                  <span>✓</span> EXECUTED
+                </div>
+                <span class="badge-counter" style="background:var(--emerald); color:#fff;">Done</span>
+              </div>
+              <div class="kanban-cards-stack" id="kanban-completed-stack"></div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==========================================
+             VIEW 3: 3D FOCUS COCKPIT (POMODORO)
+             ========================================== -->
+        <section class="view-section" id="view-pomodoro">
+          
+          <div class="card-3d" style="max-width:850px; margin:0 auto; padding:40px; text-align:center;">
+            <div class="card-glare"></div>
+
+            <div class="hero-badge-tag" style="margin-bottom:16px;">
+              <span>✦</span> ULTRA-DEEP FOCUS PROTOCOL
+            </div>
+
+            <h2 id="current-focus-task-title" style="font-family:var(--font-display); font-size:26px; font-weight:700; color:#fff; margin-bottom:8px;">
+              Implement Heartbeat RPC & Candidate State Machine in Go
+            </h2>
+            <p id="current-focus-task-desc" style="color:var(--text-secondary); max-width:600px; margin:0 auto 30px; font-size:14px;">
+              RequestVote RPC handler in raft.go. Handle randomized election timeout between 150ms and 300ms.
+            </p>
+
+            <!-- 3D Gyroscope Stage -->
+            <div class="gyro-stage" style="margin:0 auto 30px;">
+              <div class="gyro-ring ring-outer"></div>
+              <div class="gyro-ring ring-middle"></div>
+              <div class="gyro-ring ring-inner"></div>
+              <div class="timer-core-display">
+                <div class="timer-numbers" id="timer-numbers-display">25:00</div>
+                <div class="timer-mode-label" id="timer-mode-label">DEEP FOCUS</div>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="pomodoro-controls" style="justify-content:center; margin-bottom:28px;">
+              <button class="btn-action btn-primary" id="btn-pomodoro-toggle" style="padding:12px 28px; font-size:16px;">
+                <span>▶️</span> Start Focus
+              </button>
+              <button class="btn-action btn-secondary" id="btn-pomodoro-reset" style="padding:12px 20px;">
+                <span>🔄</span> Reset
+              </button>
+              <button class="btn-action btn-secondary" id="btn-ambient-audio">
+                <span>🔇</span> Ambient Focus Audio
+              </button>
+            </div>
+
+            <!-- Distraction-free scratchpad -->
+            <div style="background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:12px; padding:18px; text-align:left;">
+              <div style="font-size:12px; font-family:var(--font-mono); color:var(--text-muted); margin-bottom:8px;">
+                🧠 IN-SESSION SCRATCHPAD (Offload intrusive thoughts without context switching)
+              </div>
+              <textarea class="form-textarea" style="min-height:70px; font-size:13px;" placeholder="Quickly jot down any distraction here and return to your focus sprint immediately..."></textarea>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==========================================
+             VIEW 4: SYLLABUS INGESTION STUDIO
+             ========================================== -->
+        <section class="view-section" id="view-ingestion">
+          
+          <div class="card-3d" style="max-width:850px; margin:0 auto;">
+            <div class="card-glare"></div>
+
+            <div class="section-header-row">
+              <div>
+                <h2 style="font-size:22px; font-weight:700; color:#fff;">Intelligent Syllabus Deconstruction Studio</h2>
+                <p style="color:var(--text-secondary); font-size:13.5px;">Powered by Gemini 2.5 Pro: Extracts grade weights, late policies, and all deliverables.</p>
+              </div>
+            </div>
+
+            <!-- Quick Load Sample Syllabi Chips -->
+            <div style="margin-bottom:20px;">
+              <div style="font-size:12px; font-family:var(--font-mono); color:var(--text-muted); margin-bottom:8px;">
+                ⚡ ONE-CLICK TEST BENCHMARKS (Load authentic university syllabi):
+              </div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn-action btn-secondary" style="font-size:12px;" onclick="window.loadSampleSyllabus('course-cs410')">
+                  💾 Load CS-410 (Distributed Systems)
+                </button>
+                <button class="btn-action btn-secondary" style="font-size:12px;" onclick="window.loadSampleSyllabus('course-bio302')">
+                  🧬 Load BIO-302 (Neurobiology)
+                </button>
+                <button class="btn-action btn-secondary" style="font-size:12px;" onclick="window.loadSampleSyllabus('course-econ201')">
+                  📈 Load ECON-201 (Econometrics)
+                </button>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Course Code</label>
+                <input type="text" class="form-input" id="ingest-course-code" value="CS-410" placeholder="e.g. CS-410">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Course Title</label>
+                <input type="text" class="form-input" id="ingest-course-name" value="Advanced Distributed Systems" placeholder="e.g. Advanced Distributed Systems">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Raw Syllabus Text or Paste</label>
+              <textarea class="form-textarea" id="syllabus-raw-input" style="min-height:200px; font-family:var(--font-mono); font-size:12.5px;" placeholder="Paste raw course syllabus text here..."></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:12px;">
+              <button class="btn-action btn-primary" onclick="window.runSyllabusDeconstruction()">
+                <span>✨</span> Deconstruct & Generate Micro-Sprints
+              </button>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==========================================
+             VIEW 5: 3D ACTIVE RECALL & STUDY DECKS
+             ========================================== -->
+        <section class="view-section" id="view-study">
+          
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:28px;">
+            
+            <!-- Left: 3D Leitner Spaced-Repetition Flip Cards -->
+            <div class="card-3d">
+              <div class="card-glare"></div>
+
+              <div class="section-header-row">
+                <div>
+                  <h3 class="section-heading"><span>🧠</span> 3D Active Recall Deck</h3>
+                  <div style="font-size:12px; color:var(--text-muted); font-family:var(--font-mono);" id="deck-card-counter">
+                    Card 1 of 4
+                  </div>
+                </div>
+                <select class="form-select" id="study-deck-select" style="width:auto; padding:6px 12px; font-size:12px;">
+                  <!-- Populated by app.js -->
+                </select>
+              </div>
+
+              <!-- 3D Flip Card Stage -->
+              <div class="flashcard-stage" id="flashcard-stage">
+                <div class="flashcard-3d" id="flashcard-card-3d">
+                  
+                  <!-- Front Face -->
+                  <div class="card-face card-face-front">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span class="card-tag-pill" id="deck-title-display">CS-410 Distributed Systems</span>
+                      <span style="font-size:12px; color:var(--primary-light);">FRONT</span>
+                    </div>
+                    <div class="card-main-text" id="card-front-question">
+                      Loading Question...
+                    </div>
+                    <div class="card-flip-prompt">
+                      <span>🔄</span> Click anywhere or press Space to flip 3D card
+                    </div>
+                  </div>
+
+                  <!-- Back Face -->
+                  <div class="card-face card-face-back">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span class="card-tag-pill" style="color:var(--cyan);">ANSWER & RUBRIC</span>
+                      <span style="font-size:12px; color:var(--cyan);">BACK</span>
+                    </div>
+                    <div class="card-main-text" id="card-back-answer" style="font-size:17px;">
+                      Loading Answer...
+                    </div>
+                    <div class="card-explanation" id="card-back-explanation"></div>
+                    <div class="card-flip-prompt" style="color:var(--cyan);">
+                      <span>✓</span> Rate recall confidence below
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Leitner Rating Bar -->
+              <div class="leitner-rating-bar">
+                <button class="btn-leitner btn-leitner-again" data-leitner="1">
+                  Again <span>(1)</span>
+                </button>
+                <button class="btn-leitner btn-leitner-hard" data-leitner="2">
+                  Hard <span>(2)</span>
+                </button>
+                <button class="btn-leitner btn-leitner-good" data-leitner="3">
+                  Good <span>(3)</span>
+                </button>
+                <button class="btn-leitner btn-leitner-easy" data-leitner="4">
+                  Easy <span>(4)</span>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Right: Diagnostic Quiz Runner -->
+            <div class="card-3d" id="quiz-runner-box">
+              <div class="card-glare"></div>
+
+              <div class="section-header-row">
+                <h3 class="section-heading"><span>🎯</span> Diagnostic Self-Test</h3>
+                <span class="cognitive-tag tag-active-production" id="quiz-question-count">Question 1 of 5</span>
+              </div>
+
+              <div style="margin-bottom:20px;">
+                <p id="quiz-question-text" style="font-size:15px; line-height:1.55; color:#fff; font-weight:500;">
+                  Loading diagnostic question...
+                </p>
+              </div>
+
+              <div class="prompt-chips-wrapper" id="quiz-options-list">
+                <!-- Populated by app.js -->
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==========================================
+             VIEW 6: AEGIS AI ACADEMIC ADVISOR
+             ========================================== -->
+        <section class="view-section" id="view-advisor">
+          
+          <div class="advisor-chat-layout">
+            
+            <!-- Left: Context & Prompt Chips -->
+            <div class="advisor-sidebar-card">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="chat-avatar chat-avatar-ai">✨</div>
+                <div>
+                  <h3 style="font-size:15px; font-weight:700; color:#fff;">Aegis Copilot</h3>
+                  <div style="font-size:11px; color:var(--emerald);">● Grounded on 3 Syllabi</div>
+                </div>
+              </div>
+
+              <div style="font-size:12px; color:var(--text-muted); line-height:1.5;">
+                Ask Aegis to audit drafts against course rubrics, clarify late policies, or suggest emergency study triage plans.
+              </div>
+
+              <div class="nav-section-label" style="padding:0;">Suggested Audits:</div>
+
+              <div class="prompt-chips-wrapper">
+                <div class="prompt-chip" data-prompt="What is the late submission penalty for CS-410 Pset 1?">
+                  📋 Audit CS-410 Late Policy
+                </div>
+                <div class="prompt-chip" data-prompt="Audit my BIO-302 term paper thesis on hippocampal synaptic plasticity against the grading rubric.">
+                  🔍 Audit Term Paper Rubric
+                </div>
+                <div class="prompt-chip" data-prompt="I am feeling overwhelmed with 3 deliverables. How should I rebalance my cognitive load?">
+                  🛡️ Cognitive Burnout Triage
+                </div>
+                <div class="prompt-chip" data-prompt="Explain the key state transitions in Raft leader election and how to avoid split-vote livelocks.">
+                  ⚡ Raft State Machine Coaching
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Chat Messages & Input -->
+            <div class="advisor-chat-box">
+              <div class="chat-messages-scroll" id="advisor-chat-messages">
+                <!-- Populated by app.js -->
+              </div>
+
+              <div class="chat-input-bar">
+                <input type="text" class="chat-input-field" id="advisor-input-field" placeholder="Ask Aegis anything about your courses, rubrics, or schedule...">
+                <button class="btn-action btn-primary" id="advisor-send-btn">
+                  <span>Send</span> ➔
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ==========================================
+             VIEW 7: PREFERENCES & TIME BUDGET
+             ========================================== -->
+        <section class="view-section" id="view-settings">
+          
+          <div class="card-3d" style="max-width:700px; margin:0 auto;">
+            <div class="card-glare"></div>
+
+            <h2 style="font-size:22px; font-weight:700; color:#fff; margin-bottom:6px;">Academic Preferences & Cognitive Budget</h2>
+            <p style="color:var(--text-secondary); font-size:13.5px; margin-bottom:24px;">Configure daily study boundaries to keep the Burnout Engine calibrated.</p>
+
+            <div class="form-group">
+              <label class="form-label">Target GPA (4.00 Scale)</label>
+              <input type="number" step="0.01" min="2.0" max="4.0" class="form-input" id="pref-target-gpa" value="3.92">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Available Deep Study Hours (Per Weekday, Mon-Fri)</label>
+              <input type="number" step="0.5" min="1.0" max="12.0" class="form-input" id="pref-weekday-hours" value="4.5">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Available Study Hours (Per Weekend Day, Sat-Sun)</label>
+              <input type="number" step="0.5" min="1.0" max="16.0" class="form-input" id="pref-weekend-hours" value="7.0">
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px;">
+              <button class="btn-action btn-danger-subtle" id="btn-system-reset">
+                Reset All Benchmark Data
+              </button>
+              <button class="btn-action btn-primary" id="btn-save-settings">
+                Save & Recalculate
+              </button>
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- ==========================================
+       MODALS
+       ========================================== -->
+
+  <!-- 3D Rebalance Triage Modal -->
+  <div class="modal-backdrop" id="modal-rebalance">
+    <div class="modal-box-3d">
+      <div class="modal-header">
+        <div class="modal-title">🛡️ Cognitive Schedule Rebalance & Triage</div>
+        <button class="btn-icon" id="btn-close-rebalance">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-secondary); margin-bottom:20px; font-size:14px;">
+          Select an automated triage mode to recalculate overdue tasks and prevent academic burnout:
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          
+          <div class="prompt-chip" style="padding:16px; border-radius:14px; cursor:pointer;" onclick="window.executeTriagePlan('SURGICAL_COMPRESSION')">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <strong style="color:var(--primary-light); font-size:15px;">1. Surgical Compression</strong>
+              <span class="cognitive-tag tag-deep-focus">Recommended</span>
+            </div>
+            <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5;">
+              Compresses delayed tasks into available gaps before deadlines by optimizing focus block efficiency by 20%. Preserves all hard exam and submission dates.
+            </div>
+          </div>
+
+          <div class="prompt-chip" style="padding:16px; border-radius:14px; cursor:pointer;" onclick="window.executeTriagePlan('GRACEFUL_SPILLOVER')">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <strong style="color:var(--cyan); font-size:15px;">2. Graceful Spillover</strong>
+              <span class="cognitive-tag tag-active-production">Balanced</span>
+            </div>
+            <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5;">
+              Shifts soft reading and problem set tasks evenly across the next 72 hours, maintaining daily focus load strictly below your safety threshold.
+            </div>
+          </div>
+
+          <div class="prompt-chip" style="padding:16px; border-radius:14px; cursor:pointer;" onclick="window.executeTriagePlan('EMERGENCY_TRIAGE')">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <strong style="color:var(--rose); font-size:15px;">3. Emergency 80/20 Triage</strong>
+              <span class="cognitive-tag tag-admin-review">Pareto Mode</span>
+            </div>
+            <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5;">
+              Isolates maximum cognitive energy for high-stakes deliverables (midterms and capstones). Concedes or fast-tracks low-weight administrative micro-tasks.
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action btn-secondary" onclick="document.getElementById('modal-rebalance').classList.remove('open')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Logic Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/three-scene.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/advisor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

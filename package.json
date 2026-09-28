@@ -1,0 +1,20 @@
+{
+  "name": "academiq-os",
+  "version": "1.0.0",
+  "description": "Academiq OS - 3D AI Academic Execution & Cognitive Roadmap System",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "academic",
+    "ai",
+    "execution-system",
+    "pomodoro",
+    "threejs",
+    "3d",
+    "student-tracker"
+  ],
+  "author": "Academiq Team",
+  "license": "MIT"
+}
