@@ -36,7 +36,14 @@ class AcademiqStore {
       skillMap: {}, // e.g. { "Deadlocks": { status: "Weak", accuracy: 38, reviews: 4 } }
       recallHistory: [],
       diagnosticHistory: [],
-      completedFocusSessionsToday: 0
+      completedFocusSessionsToday: 0,
+      pomodoro: {
+        secondsLeft: 25 * 60,
+        isRunning: false,
+        lastUpdatedTimestamp: Date.now(),
+        currentTaskId: null,
+        scratchpadText: ""
+      }
     };
   }
 
@@ -128,6 +135,144 @@ class AcademiqStore {
       console.warn("Failed to persist to localStorage:", e);
     }
     this.notify();
+  }
+
+  // --- POMODORO OFFLINE RESILIENCE & LOCAL PERSISTENCE ---
+  updatePomodoro(updates) {
+    if (!this.state.pomodoro) {
+      this.state.pomodoro = {
+        secondsLeft: 25 * 60,
+        isRunning: false,
+        lastUpdatedTimestamp: Date.now(),
+        currentTaskId: null,
+        scratchpadText: ""
+      };
+    }
+    this.state.pomodoro = {
+      ...this.state.pomodoro,
+      ...updates,
+      lastUpdatedTimestamp: Date.now()
+    };
+    try {
+      localStorage.setItem(this.getStorageKey(), JSON.stringify(this.state));
+    } catch (e) {
+      console.warn("Failed to persist Pomodoro state:", e);
+    }
+  }
+
+  getPomodoroState() {
+    if (!this.state.pomodoro) {
+      this.state.pomodoro = {
+        secondsLeft: 25 * 60,
+        isRunning: false,
+        lastUpdatedTimestamp: Date.now(),
+        currentTaskId: null,
+        scratchpadText: ""
+      };
+    }
+    const p = this.state.pomodoro;
+    // Calculate and subtract elapsed time if timer was actively running before browser unload/refresh
+    if (p.isRunning && p.lastUpdatedTimestamp) {
+      const elapsedSeconds = Math.floor((Date.now() - p.lastUpdatedTimestamp) / 1000);
+      if (elapsedSeconds > 0) {
+        p.secondsLeft = Math.max(0, (p.secondsLeft || 25 * 60) - elapsedSeconds);
+        if (p.secondsLeft === 0) {
+          p.isRunning = false;
+        }
+        p.lastUpdatedTimestamp = Date.now();
+        this.saveState();
+      }
+    }
+    return p;
+  }
+
+  // --- DEMO / SAMPLE DATA TOGGLE FOR FIRST-TIME VISITORS ---
+  loadDemoData() {
+    const demo = window.ACADEMIQ_INITIAL_DATA;
+    if (!demo) return false;
+
+    const now = Date.now();
+    const deepCopy = JSON.parse(JSON.stringify(demo));
+    const todayStr = new Date().toISOString().split('T')[0];
+    const tomorrowStr = new Date(now + 86400000).toISOString().split('T')[0];
+    const yesterdayStr = new Date(now - 86400000).toISOString().split('T')[0];
+
+    if (deepCopy.executionTasks) {
+      deepCopy.executionTasks.forEach((t, i) => {
+        if (i % 3 === 0) t.scheduledDate = todayStr;
+        else if (i % 3 === 1) t.scheduledDate = tomorrowStr;
+        else {
+          t.scheduledDate = yesterdayStr;
+          t.status = 'OVERDUE';
+        }
+      });
+    }
+
+    // Pre-seed realistic SM-2 spaced repetition metadata
+    if (deepCopy.studyDecks) {
+      deepCopy.studyDecks.forEach(deck => {
+        (deck.cards || []).forEach((c, idx) => {
+          c.easeFactor = 2.5;
+          if (idx === 0) {
+            c.reps = 0;
+            c.interval = 1;
+            c.nextReviewDate = new Date(now - 7200000).toISOString(); // Overdue now!
+          } else if (idx === 1) {
+            c.reps = 1;
+            c.interval = 1;
+            c.nextReviewDate = new Date(now + 86400000).toISOString(); // Due tomorrow
+          } else if (idx === 2) {
+            c.reps = 2;
+            c.interval = 6;
+            c.nextReviewDate = new Date(now - 3600000).toISOString(); // Overdue now!
+          } else {
+            c.reps = 3;
+            c.interval = 15;
+            c.nextReviewDate = new Date(now + 86400000 * 5).toISOString();
+          }
+        });
+      });
+    }
+
+    this.state = {
+      ...this.getBlankState(),
+      profile: {
+        ...this.state.profile,
+        ...deepCopy.profile,
+        fullName: this.currentUser?.user_metadata?.full_name || deepCopy.profile.fullName || "Alex Vance",
+        onboardingCompleted: true
+      },
+      courses: deepCopy.courses || [],
+      milestones: deepCopy.milestones || [],
+      executionTasks: deepCopy.executionTasks || [],
+      studyDecks: deepCopy.studyDecks || [],
+      skillMap: {
+        "Distributed Algorithms": { status: "Weak", accuracy: 42, reviews: 5 },
+        "Cellular Neurobiology": { status: "Medium", accuracy: 68, reviews: 3 },
+        "Linearizability": { status: "Weak", accuracy: 35, reviews: 2 },
+        "Consensus Protocols": { status: "Strong", accuracy: 88, reviews: 7 }
+      },
+      completedFocusSessionsToday: 2,
+      pomodoro: {
+        secondsLeft: 25 * 60,
+        isRunning: false,
+        lastUpdatedTimestamp: Date.now(),
+        currentTaskId: deepCopy.executionTasks?.[0]?.id || null,
+        scratchpadText: "Key objectives for today:\n• Implement Raft heartbeat RPC & candidate election timer\n• Review NMDA receptor activation curve & LTP induction\n• 25m Pomodoro deep focus session"
+      }
+    };
+
+    this.saveState();
+
+    if (window.academiqSupabase && this.currentUser) {
+      window.academiqSupabase.saveUserProfile(this.currentUser.id, {
+        ...this.state.profile,
+        skillMap: this.state.skillMap
+      });
+      window.academiqSupabase.syncAllTasks(this.state.executionTasks, this.currentUser.id);
+    }
+
+    return true;
   }
 
   subscribe(listener) {
@@ -361,21 +506,71 @@ class AcademiqStore {
     }
   }
 
-  // Spaced Repetition Mastery Recording (Active Recall)
+  // SuperMemo-2 (SM-2) Spaced Repetition Core Algorithm
+  calculateSM2(card, quality) {
+    // quality: 1 to 5 (1=Blackout, 2=Incorrect/Vague, 3=Fair/Hard, 4=Good, 5=Mastered)
+    const q = Math.max(1, Math.min(5, quality || 3));
+    let reps = card.reps || 0;
+    let interval = card.interval || 0;
+    let easeFactor = card.easeFactor || 2.5;
+
+    if (q >= 3) {
+      if (reps === 0) {
+        interval = 1;
+      } else if (reps === 1) {
+        interval = 6;
+      } else {
+        interval = Math.round(interval * easeFactor);
+      }
+      reps += 1;
+    } else {
+      reps = 0;
+      interval = 1;
+    }
+
+    // Ease Factor update formula: EF' = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))
+    easeFactor = easeFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+    if (easeFactor < 1.3) easeFactor = 1.3;
+
+    const nextReviewDate = new Date(Date.now() + interval * 86400000).toISOString();
+
+    return {
+      reps,
+      interval,
+      easeFactor: Math.round(easeFactor * 100) / 100,
+      nextReviewDate,
+      lastReviewed: new Date().toISOString()
+    };
+  }
+
+  // Spaced Repetition Mastery Recording (Active Recall with SM-2)
   recordCardRecall(deckId, cardId, confidence, evaluation) {
     const deck = this.state.studyDecks.find(d => d.id === deckId) || this.state.studyDecks[0];
-    if (!deck) return;
+    if (!deck) return { topicStat: { status: 'Medium', accuracy: 50 }, adaptiveNotice: null };
     const card = deck.cards.find(c => c.id === cardId);
-    if (!card) return;
+    if (!card) return { topicStat: { status: 'Medium', accuracy: 50 }, adaptiveNotice: null };
 
     const topic = card.topic || deck.topic || 'General';
-    let masteryDelta = 0;
-    if (evaluation === 'KNEW_IT') masteryDelta = 1;
-    else if (evaluation === 'DID_NOT_KNOW') masteryDelta = -1;
 
-    card.mastery = Math.min(5, Math.max(1, (card.mastery || 1) + masteryDelta));
+    // Map user confidence (1-5) and self-evaluation to SM-2 quality (1-5)
+    let quality = confidence || 3;
+    if (evaluation === 'DID_NOT_KNOW') {
+      quality = Math.min(quality, 2);
+    } else if (evaluation === 'KNEW_IT') {
+      quality = Math.max(quality, 3);
+    } else if (evaluation === 'PARTIALLY') {
+      quality = 3;
+    }
+
+    // Calculate SM-2 spaced repetition metrics
+    const sm2Result = this.calculateSM2(card, quality);
+    card.reps = sm2Result.reps;
+    card.interval = sm2Result.interval;
+    card.easeFactor = sm2Result.easeFactor;
+    card.nextReviewDate = sm2Result.nextReviewDate;
+    card.lastReviewed = sm2Result.lastReviewed;
+    card.mastery = Math.min(5, Math.max(1, quality));
     card.lastConfidence = confidence;
-    card.lastReviewed = new Date().toISOString();
 
     // Update Skill Profile
     if (!this.state.skillMap[topic]) {
@@ -410,6 +605,11 @@ class AcademiqStore {
         topic,
         confidence,
         evaluation,
+        quality,
+        reps: card.reps,
+        interval: card.interval,
+        easeFactor: card.easeFactor,
+        nextReviewDate: card.nextReviewDate,
         masteryLevel: card.mastery
       });
       window.academiqSupabase.saveDeck(deck, this.currentUser.id);
@@ -419,7 +619,7 @@ class AcademiqStore {
       });
     }
 
-    return { topicStat, adaptiveNotice };
+    return { topicStat, adaptiveNotice, sm2Result };
   }
 
   // ADAPTIVE LEARNING LOOP TRIGGER
@@ -517,27 +717,53 @@ class AcademiqStore {
     const skillMap = this.state.skillMap || {};
     const milestones = this.state.milestones || [];
     const today = new Date();
+    const now = Date.now();
+
+    // 1. Scan for overdue SM-2 Spaced Repetition flashcards across all decks
+    const overdueCardsByTopic = {};
+    let totalOverdueCards = 0;
+
+    (this.state.studyDecks || []).forEach(deck => {
+      (deck.cards || []).forEach(card => {
+        if (card.nextReviewDate && new Date(card.nextReviewDate).getTime() <= now) {
+          totalOverdueCards++;
+          const t = card.topic || deck.topic || 'General';
+          overdueCardsByTopic[t] = (overdueCardsByTopic[t] || 0) + 1;
+        }
+      });
+    });
 
     if (tasks.length === 0) {
-      // Synthesize recommendation based on weakest topic
+      // If overdue SM-2 cards exist, synthesize a Spaced Repetition Flashcard Sprint!
+      const overdueTopics = Object.keys(overdueCardsByTopic).sort((a,b) => overdueCardsByTopic[b] - overdueCardsByTopic[a]);
       const weakTopics = Object.keys(skillMap).filter(k => skillMap[k].status === 'Weak');
-      const topicToTarget = weakTopics[0] || 'Active Recall Review';
+      const topicToTarget = overdueTopics[0] || weakTopics[0] || 'Active Recall Review';
+      
+      const deckForTopic = (this.state.studyDecks || []).find(d => d.topic === topicToTarget || (d.cards || []).some(c => c.topic === topicToTarget));
+      const course = this.state.courses.find(c => c.id === deckForTopic?.courseId) || this.state.courses[0] || { code: 'CORE', name: 'Academic Core' };
+      const overdueCount = overdueCardsByTopic[topicToTarget] || 0;
+
       return {
-        subjectCode: this.state.courses[0]?.code || 'CORE',
-        subjectName: this.state.courses[0]?.name || 'Academic Core',
+        subjectCode: course.code,
+        subjectName: course.name,
         topic: topicToTarget,
-        taskTitle: `Reinforce ${topicToTarget} Foundations`,
-        instructions: `Take a 25-minute focused active recall cycle on ${topicToTarget} to prepare for upcoming assessments.`,
-        durationMinutes: 25,
-        difficulty: 'High',
+        taskTitle: overdueCount > 0 ? `Spaced Repetition: ${topicToTarget}` : `Reinforce ${topicToTarget} Foundations`,
+        instructions: overdueCount > 0 
+          ? `Review ${overdueCount} SM-2 card(s) that reached their scheduled repetition interval to halt forgetting curve decay.` 
+          : `Take a 25-minute focused active recall cycle on ${topicToTarget} to prepare for upcoming assessments.`,
+        durationMinutes: 20,
+        difficulty: 'Moderate',
         priority: 'HIGH',
-        reason: `Current mastery: ${skillMap[topicToTarget]?.accuracy || 40}% | Highest cognitive leverage action | 0 pending sprints in queue`,
-        isDynamic: true
+        reason: overdueCount > 0 
+          ? `${overdueCount} card(s) due for SM-2 review • Prevents long-term memory decay` 
+          : `Current mastery: ${skillMap[topicToTarget]?.accuracy || 40}% | Highest cognitive leverage action`,
+        isDynamic: true,
+        actionType: overdueCount > 0 ? 'STUDY_RECALL' : 'FOCUS_SPRINT'
       };
     }
 
     // Rank pending tasks by scoring formula:
-    // Score = (isOverdue ? 40 : 0) + (isWeakTopic ? 35 : 0) + (nearMilestoneDays <= 7 ? 25 : 0)
+    // Score = (isOverdue ? 40 : 0) + (isWeakTopic ? 35 : 0) + (nearMilestoneDays <= 7 ? 25 : 0) + (overdueSM2Cards * 10) + (syllabusWeight * 0.4)
     let bestTask = tasks[0];
     let highestScore = -1;
     let rationale = "";
@@ -548,23 +774,43 @@ class AcademiqStore {
 
       if (t.status === 'OVERDUE') {
         score += 40;
-        reasons.push("Overdue task");
+        reasons.push("Overdue micro-sprint");
       }
 
       if (t.topic && skillMap[t.topic] && skillMap[t.topic].status === 'Weak') {
         score += 35;
-        reasons.push(`Current mastery: ${skillMap[t.topic].accuracy}%`);
+        reasons.push(`Mastery level: ${skillMap[t.topic].accuracy}% (Weak)`);
       }
 
-      // Check milestone proximity
+      // Check overdue SM-2 flashcard intervals for this topic
+      const overdueSM2 = overdueCardsByTopic[t.topic] || 0;
+      if (overdueSM2 > 0) {
+        score += Math.min(30, overdueSM2 * 12);
+        reasons.push(`${overdueSM2} SM-2 recall card(s) overdue`);
+      }
+
+      // Check milestone proximity and syllabus exam weights
       if (t.milestoneId) {
         const ms = milestones.find(m => m.id === t.milestoneId);
         if (ms && ms.dueDate) {
           const diffDays = Math.ceil((new Date(ms.dueDate) - today) / (1000 * 60 * 60 * 24));
           if (diffDays >= 0 && diffDays <= 7) {
             score += Math.max(10, 30 - diffDays * 3);
-            reasons.push(`Exam in ${diffDays} day(s)`);
+            reasons.push(`High-stakes assessment in ${diffDays} day(s)`);
           }
+        }
+      }
+
+      // Syllabus grade category weight impact
+      const courseObj = this.state.courses.find(c => c.id === t.courseId);
+      if (courseObj && Array.isArray(courseObj.gradeWeights)) {
+        const matchedWeight = courseObj.gradeWeights.find(w => 
+          (t.title && t.title.toLowerCase().includes(w.categoryName.toLowerCase())) ||
+          (t.topic && t.topic.toLowerCase().includes(w.categoryName.toLowerCase()))
+        );
+        if (matchedWeight) {
+          score += Math.round(matchedWeight.weightPercentage * 0.4);
+          reasons.push(`${matchedWeight.weightPercentage}% final grade impact`);
         }
       }
 
@@ -575,7 +821,7 @@ class AcademiqStore {
       if (score > highestScore) {
         highestScore = score;
         bestTask = t;
-        rationale = reasons.join(" • ") || "Scheduled for maximum retention today";
+        rationale = reasons.join(" • ") || "Scheduled for maximum cognitive retention today";
       }
     });
 
@@ -592,7 +838,8 @@ class AcademiqStore {
       difficulty: bestTask.cognitiveLoad === 'DEEP_FOCUS' ? 'High' : 'Moderate',
       priority: bestTask.priority || 'HIGH',
       reason: rationale,
-      isDynamic: true
+      isDynamic: true,
+      actionType: 'FOCUS_SPRINT'
     };
   }
 

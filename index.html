@@ -78,6 +78,10 @@
         Continue with Google
       </button>
 
+      <button type="button" class="btn-action" id="btn-skip-to-demo" style="width:100%; justify-content:center; padding:11px; font-size:13.5px; margin-top:10px; background:rgba(6, 182, 212, 0.12); border:1px dashed var(--cyan); color:#67e8f9; font-weight:600;">
+        <span>🚀</span> Instant Demo Profile (No Sign-In Required)
+      </button>
+
       <div class="auth-footer-links">
         Don't have an account? <a href="#" data-auth-switch="signup">Create account</a>
       </div>
@@ -298,6 +302,7 @@
 
   <!-- Application Shell -->
   <div id="app-root">
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
     <!-- 1. SIDEBAR -->
     <aside class="sidebar">
@@ -380,6 +385,9 @@
           </div>
         </div>
         <div class="topbar-right">
+          <button class="btn-action btn-secondary" id="btn-topbar-load-demo" title="Load sample Stanford / MIT curriculum, active sprints, and flashcards">
+            <span>💾</span> Sample Data
+          </button>
           <button class="btn-action btn-danger-subtle" id="trigger-rebalance-modal">
             <span>🛡️</span> Run Triage Rebalance
           </button>
@@ -451,12 +459,12 @@
             </div>
           </div>
 
-          <!-- KPI Metric Cards (Transparent & Explainable) -->
+          <!-- KPI Metric Cards (Transparent & Plain-English Explainable) -->
           <div class="kpi-row">
             <div class="kpi-card" title="Projected GPA based on graded deliverables and current syllabus weights">
               <div class="kpi-icon-box kpi-icon-purple">🎓</div>
               <div class="kpi-data">
-                <div class="kpi-label">Projected GPA</div>
+                <div class="kpi-label">Projected GPA <span style="font-size:10px; color:var(--text-muted);">(Grade Forecast)</span></div>
                 <div class="kpi-value" id="kpi-gpa-val">3.84</div>
                 <div class="kpi-trend trend-up" id="kpi-gpa-target">▲ Target: 3.90</div>
               </div>
@@ -465,7 +473,7 @@
             <div class="kpi-card" title="Completion Velocity = (Completed Tasks / Total Scheduled Tasks) * 100">
               <div class="kpi-icon-box kpi-icon-cyan">⚡</div>
               <div class="kpi-data">
-                <div class="kpi-label">Completion Velocity</div>
+                <div class="kpi-label">Completion Pace <span style="font-size:10px; color:var(--text-muted);">(Task Velocity)</span></div>
                 <div class="kpi-value" id="kpi-velocity-val">84%</div>
                 <div class="kpi-trend trend-up" id="kpi-velocity-trend">▲ +8% vs. prior cycle</div>
               </div>
@@ -474,7 +482,7 @@
             <div class="kpi-card" title="Productivity & Cognitive Load Indicator (not a clinical medical diagnosis)">
               <div class="kpi-icon-box kpi-icon-emerald">🛡️</div>
               <div class="kpi-data">
-                <div class="kpi-label">Burnout Risk Index</div>
+                <div class="kpi-label">Workload Stress <span style="font-size:10px; color:var(--text-muted);">(Load vs Limit)</span></div>
                 <div class="kpi-value" id="kpi-burnout-val" style="color:var(--emerald);">LOW (28/100)</div>
                 <div class="kpi-trend" id="kpi-burnout-desc" style="font-size:11px;">Workload within safe boundary</div>
               </div>
@@ -483,7 +491,7 @@
             <div class="kpi-card" title="Cognitive Budget = Daily study capacity minus completed workload minus scheduled load">
               <div class="kpi-icon-box kpi-icon-amber">⏱️</div>
               <div class="kpi-data">
-                <div class="kpi-label">Cognitive Budget Today</div>
+                <div class="kpi-label">Daily Study Buffer <span style="font-size:10px; color:var(--text-muted);">(Hours Left)</span></div>
                 <div class="kpi-value" id="kpi-hours-val">2.5h / 4.5h</div>
                 <div class="kpi-trend trend-up" id="kpi-capacity-margin">Safe Capacity Margin: 44%</div>
               </div>
@@ -696,7 +704,7 @@
               <div style="font-size:12px; font-family:var(--font-mono); color:var(--text-muted); margin-bottom:8px;">
                 🧠 IN-SESSION SCRATCHPAD (Offload intrusive thoughts without context switching)
               </div>
-              <textarea class="form-textarea" style="min-height:70px; font-size:13px;" placeholder="Quickly jot down any distraction here and return to your focus sprint immediately..."></textarea>
+              <textarea class="form-textarea" id="pomodoro-scratchpad" style="min-height:70px; font-size:13px;" placeholder="Quickly jot down any distraction here and return to your focus sprint immediately..."></textarea>
             </div>
 
           </div>
@@ -753,7 +761,7 @@
             </div>
 
             <div style="display:flex; justify-content:flex-end; gap:12px;">
-              <button class="btn-action btn-primary" onclick="window.runSyllabusDeconstruction()">
+              <button class="btn-action btn-primary" id="btn-run-syllabus-deconstruct" onclick="window.runSyllabusDeconstruction()">
                 <span>✨</span> Deconstruct & Generate Micro-Sprints
               </button>
             </div>
@@ -1116,31 +1124,31 @@
           
           <div class="prompt-chip" style="padding:16px; border-radius:14px; cursor:pointer;" onclick="window.executeTriagePlan('SURGICAL_COMPRESSION')">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <strong style="color:var(--primary-light); font-size:15px;">1. Surgical Compression</strong>
+              <strong style="color:var(--primary-light); font-size:15px;">1. Compress Today (Finish Overdue Now)</strong>
               <span class="cognitive-tag tag-deep-focus">Recommended</span>
             </div>
             <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5;">
-              Compresses delayed tasks into available gaps before deadlines by optimizing focus block efficiency by 20%. Preserves all hard exam and submission dates.
+              Optimizes focus blocks by 20% to fit delayed tasks into today's gaps without delaying any exams or project checkpoints.
             </div>
           </div>
 
           <div class="prompt-chip" style="padding:16px; border-radius:14px; cursor:pointer;" onclick="window.executeTriagePlan('GRACEFUL_SPILLOVER')">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <strong style="color:var(--cyan); font-size:15px;">2. Graceful Spillover</strong>
+              <strong style="color:var(--cyan); font-size:15px;">2. Spread Out (Distribute Over Next 3 Days)</strong>
               <span class="cognitive-tag tag-active-production">Balanced</span>
             </div>
             <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5;">
-              Shifts soft reading and problem set tasks evenly across the next 72 hours, maintaining daily focus load strictly below your safety threshold.
+              Gently moves non-critical reading and practice tasks across the next 72 hours, preventing cognitive overload.
             </div>
           </div>
 
           <div class="prompt-chip" style="padding:16px; border-radius:14px; cursor:pointer;" onclick="window.executeTriagePlan('EMERGENCY_TRIAGE')">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <strong style="color:var(--rose); font-size:15px;">3. Emergency 80/20 Triage</strong>
-              <span class="cognitive-tag tag-admin-review">Pareto Mode</span>
+              <strong style="color:var(--rose); font-size:15px;">3. High-Priority Only (Drop Low-Weight Tasks)</strong>
+              <span class="cognitive-tag tag-admin-review">80/20 Rule</span>
             </div>
             <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5;">
-              Isolates maximum cognitive energy for high-stakes deliverables (midterms and capstones). Concedes or fast-tracks low-weight administrative micro-tasks.
+              Focuses 100% of your energy on high-stakes deliverables (exams, capstones) while automatically archiving small busywork.
             </div>
           </div>
 
@@ -1151,6 +1159,30 @@
       </div>
     </div>
   </div>
+
+  <!-- Mobile Bottom Navigation (Visible on Screens < 768px) -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Mobile Navigation">
+    <button class="mobile-bottom-tab active" data-view="dashboard" aria-label="Dashboard">
+      <span class="tab-icon">⚡</span>
+      <span class="tab-label">Cockpit</span>
+    </button>
+    <button class="mobile-bottom-tab" data-view="roadmap" aria-label="Roadmap">
+      <span class="tab-icon">🗺️</span>
+      <span class="tab-label">Roadmap</span>
+    </button>
+    <button class="mobile-bottom-tab" data-view="pomodoro" aria-label="Focus Cockpit">
+      <span class="tab-icon">🎯</span>
+      <span class="tab-label">Focus</span>
+    </button>
+    <button class="mobile-bottom-tab" data-view="study" aria-label="Active Recall">
+      <span class="tab-icon">🧠</span>
+      <span class="tab-label">Recall</span>
+    </button>
+    <button class="mobile-bottom-tab" id="btn-mobile-more" aria-label="More Menu">
+      <span class="tab-icon">☰</span>
+      <span class="tab-label">More</span>
+    </button>
+  </nav>
 
   <!-- Toast Notification Container -->
   <div id="toast-container"></div>

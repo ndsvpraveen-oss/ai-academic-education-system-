@@ -34,11 +34,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const pageTitleEl = document.getElementById('topbar-page-title');
   const mobileToggleBtn = document.getElementById('btn-mobile-menu');
   const sidebarEl = document.querySelector('.sidebar');
+  const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+  const mobileMoreBtn = document.getElementById('btn-mobile-more');
 
-  if (mobileToggleBtn && sidebarEl) {
+  function openMobileDrawer() {
+    if (sidebarEl) sidebarEl.classList.add('mobile-open');
+    if (sidebarBackdrop) sidebarBackdrop.classList.add('active');
+  }
+
+  function closeMobileDrawer() {
+    if (sidebarEl) sidebarEl.classList.remove('mobile-open');
+    if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
+  }
+
+  if (mobileToggleBtn) {
     mobileToggleBtn.addEventListener('click', () => {
-      sidebarEl.classList.toggle('mobile-open');
+      if (sidebarEl && sidebarEl.classList.contains('mobile-open')) {
+        closeMobileDrawer();
+      } else {
+        openMobileDrawer();
+      }
     });
+  }
+
+  if (mobileMoreBtn) {
+    mobileMoreBtn.addEventListener('click', () => {
+      openMobileDrawer();
+      if (audio) audio.playClick();
+    });
+  }
+
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', closeMobileDrawer);
   }
 
   function switchView(viewName) {
@@ -51,7 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (targetSec) targetSec.classList.add('active');
     if (activeLink) activeLink.classList.add('active');
 
-    if (sidebarEl) sidebarEl.classList.remove('mobile-open');
+    // Update mobile bottom nav active tab
+    document.querySelectorAll('.mobile-bottom-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.getAttribute('data-view') === viewName);
+    });
+
+    closeMobileDrawer();
 
     const titles = {
       dashboard: "Executive Execution Cockpit",
@@ -87,6 +119,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Mobile Bottom Navigation Tabs
+  document.querySelectorAll('.mobile-bottom-tab[data-view]').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      const view = tab.getAttribute('data-view');
+      switchView(view);
+    });
+  });
+
   document.querySelectorAll('[data-goto]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -94,6 +135,31 @@ document.addEventListener('DOMContentLoaded', () => {
       switchView(target);
     });
   });
+
+  // --- DEMO / SAMPLE DATA TOGGLE EVENT HANDLERS ---
+  function handleLoadDemo() {
+    const success = store.loadDemoData();
+    if (success) {
+      const authContainer = document.getElementById('auth-container');
+      const appRoot = document.getElementById('app-root');
+      if (authContainer) authContainer.style.display = 'none';
+      if (appRoot) appRoot.style.display = 'flex';
+
+      switchView('dashboard');
+      window.showToast("🚀 Loaded authentic Stanford/MIT EECS coursework, SM-2 flashcards & active micro-sprints!", "success");
+      if (audio) audio.playSuccess();
+    }
+  }
+
+  const btnTopbarDemo = document.getElementById('btn-topbar-load-demo');
+  if (btnTopbarDemo) {
+    btnTopbarDemo.addEventListener('click', handleLoadDemo);
+  }
+
+  const btnSkipToDemo = document.getElementById('btn-skip-to-demo');
+  if (btnSkipToDemo) {
+    btnSkipToDemo.addEventListener('click', handleLoadDemo);
+  }
 
   // --- 3. 3D CARD TILT PHYSICS ENGINE ---
   function init3DTilt() {
@@ -139,7 +205,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (studyNowBtn && nextSprint) {
       studyNowBtn.onclick = () => {
-        if (nextSprint.taskId) {
+        if (nextSprint.actionType === 'STUDY_RECALL') {
+          switchView('study');
+          const decks = store.state.studyDecks || [];
+          const deckIdx = decks.findIndex(d => d.topic === nextSprint.topic || (d.cards || []).some(c => c.topic === nextSprint.topic));
+          if (deckIdx >= 0) {
+            activeDeckIndex = deckIdx;
+            activeCardIndex = 0;
+            const ds = document.getElementById('study-deck-select');
+            if (ds) ds.value = deckIdx;
+            renderFlashcards();
+          }
+          window.showToast(`🎯 Loaded Spaced Repetition deck for "${nextSprint.topic}"!`, 'info');
+        } else if (nextSprint.taskId) {
           window.startFocusOnTask(nextSprint.taskId);
         } else {
           switchView('pomodoro');
@@ -147,7 +225,8 @@ document.addEventListener('DOMContentLoaded', () => {
           const dEl = document.getElementById('current-focus-task-desc');
           if (tEl) tEl.textContent = nextSprint.taskTitle;
           if (dEl) dEl.textContent = nextSprint.instructions;
-          pomodoroSecondsLeft = nextSprint.durationMinutes * 60;
+          pomodoroSecondsLeft = (nextSprint.durationMinutes || 25) * 60;
+          store.updatePomodoro({ secondsLeft: pomodoroSecondsLeft, isRunning: true });
           updateTimerDisplay();
           startPomodoro();
         }
@@ -377,16 +456,41 @@ document.addEventListener('DOMContentLoaded', () => {
     init3DTilt();
   }
 
-  // --- 6. 3D FOCUS COCKPIT (POMODORO) ENGINE ---
+  // --- 6. 3D FOCUS COCKPIT (POMODORO) ENGINE WITH OFFLINE PERSISTENCE ---
+  const savedPomodoro = store.getPomodoroState();
   let pomodoroInterval = null;
-  let pomodoroSecondsLeft = 25 * 60;
+  let pomodoroSecondsLeft = savedPomodoro.secondsLeft !== undefined ? savedPomodoro.secondsLeft : 25 * 60;
   let isPomodoroRunning = false;
 
   const timerNumbersEl = document.getElementById('timer-numbers-display');
   const startStopBtn = document.getElementById('btn-pomodoro-toggle');
   const resetBtn = document.getElementById('btn-pomodoro-reset');
   const ambientAudioBtn = document.getElementById('btn-ambient-audio');
+  const scratchpadEl = document.getElementById('pomodoro-scratchpad');
   let isAmbientPlaying = false;
+
+  // Initialize scratchpad from store
+  if (scratchpadEl) {
+    scratchpadEl.value = savedPomodoro.scratchpadText || "";
+    let scratchpadDebounce = null;
+    scratchpadEl.addEventListener('input', (e) => {
+      clearTimeout(scratchpadDebounce);
+      scratchpadDebounce = setTimeout(() => {
+        store.updatePomodoro({ scratchpadText: e.target.value });
+      }, 350);
+    });
+  }
+
+  // Restore active focus task title if saved
+  if (savedPomodoro.currentTaskId) {
+    const savedTask = store.state.executionTasks.find(t => t.id === savedPomodoro.currentTaskId);
+    if (savedTask) {
+      const focusTaskTitle = document.getElementById('current-focus-task-title');
+      const focusTaskDesc = document.getElementById('current-focus-task-desc');
+      if (focusTaskTitle) focusTaskTitle.textContent = savedTask.title;
+      if (focusTaskDesc) focusTaskDesc.textContent = savedTask.instructions;
+    }
+  }
 
   function updateTimerDisplay() {
     const mins = Math.floor(pomodoroSecondsLeft / 60);
@@ -399,6 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function startPomodoro() {
     if (isPomodoroRunning) return;
     isPomodoroRunning = true;
+    store.updatePomodoro({ secondsLeft: pomodoroSecondsLeft, isRunning: true });
     if (startStopBtn) startStopBtn.innerHTML = `<span>⏸️</span> Pause Focus`;
     if (audio) audio.playClick();
 
@@ -406,9 +511,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pomodoroSecondsLeft > 0) {
         pomodoroSecondsLeft--;
         updateTimerDisplay();
+        if (pomodoroSecondsLeft % 5 === 0) {
+          store.updatePomodoro({ secondsLeft: pomodoroSecondsLeft, isRunning: true });
+        }
       } else {
         clearInterval(pomodoroInterval);
         isPomodoroRunning = false;
+        pomodoroSecondsLeft = 25 * 60;
+        store.updatePomodoro({ secondsLeft: 25 * 60, isRunning: false });
         if (audio) audio.playGong();
         window.showToast("🔔 25-Min Sprint Completed! Take a 5-minute cognitive break.", "success");
         if (startStopBtn) startStopBtn.innerHTML = `<span>▶️</span> Start Focus`;
@@ -420,6 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isPomodoroRunning) return;
     clearInterval(pomodoroInterval);
     isPomodoroRunning = false;
+    store.updatePomodoro({ secondsLeft: pomodoroSecondsLeft, isRunning: false });
     if (startStopBtn) startStopBtn.innerHTML = `<span>▶️</span> Resume Focus`;
     if (audio) audio.playClick();
   }
@@ -435,6 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resetBtn.addEventListener('click', () => {
       pausePomodoro();
       pomodoroSecondsLeft = 25 * 60;
+      store.updatePomodoro({ secondsLeft: 25 * 60, isRunning: false });
       updateTimerDisplay();
     });
   }
@@ -467,9 +579,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (focusTaskDesc) focusTaskDesc.textContent = task.instructions;
 
     pomodoroSecondsLeft = (task.estimatedMinutes || 25) * 60;
+    store.updatePomodoro({
+      currentTaskId: task.id,
+      secondsLeft: pomodoroSecondsLeft,
+      isRunning: true
+    });
     updateTimerDisplay();
     startPomodoro();
   };
+
+  // Auto-resume if timer was actively running before refresh
+  if (savedPomodoro.isRunning && pomodoroSecondsLeft > 0) {
+    startPomodoro();
+  } else {
+    updateTimerDisplay();
+  }
 
   // --- 7. ACTIVE RECALL SPATIAL FLIP CARDS ---
   let activeDeckIndex = 0;
@@ -508,12 +632,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const backAnswer = document.getElementById('card-back-answer');
     const backExpl = document.getElementById('card-back-explanation');
     const counterEl = document.getElementById('deck-card-counter');
-    const deckTitleEl = document.getElementById('deck-title-display');
+    const isDue = !card.nextReviewDate || new Date(card.nextReviewDate).getTime() <= Date.now();
+    const intervalStr = card.interval ? `${card.interval}d` : '1d';
+    const easeStr = (card.easeFactor || 2.5).toFixed(1);
+    const sm2Status = isDue ? '🔥 DUE FOR REVIEW' : `Next review: ${new Date(card.nextReviewDate).toLocaleDateString()}`;
 
     if (frontText) frontText.textContent = card.question;
     if (backAnswer) backAnswer.textContent = card.answer;
     if (backExpl) backExpl.textContent = card.explanation || '';
-    if (counterEl) counterEl.textContent = `Card ${activeCardIndex + 1} of ${deck.cards.length}`;
+    if (counterEl) counterEl.textContent = `Card ${activeCardIndex + 1}/${deck.cards.length} • [SM-2: ${intervalStr} | EF ${easeStr}] • ${sm2Status}`;
     if (deckTitleEl) deckTitleEl.textContent = `${deck.title} • ${card.topic || deck.topic}`;
 
     if (cardEl) cardEl.classList.remove('flipped');
@@ -559,7 +686,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Self-Evaluation Rating Buttons
+  // Self-Evaluation Rating Buttons (SM-2 Spaced Repetition Integration)
   document.querySelectorAll('[data-eval]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -570,10 +697,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const deck = decks[activeDeckIndex];
       const card = deck.cards[activeCardIndex];
 
-      const { topicStat, adaptiveNotice } = store.recordCardRecall(deck.id, card.id, selectedConfidence, evaluation);
+      const { topicStat, adaptiveNotice, sm2Result } = store.recordCardRecall(deck.id, card.id, selectedConfidence, evaluation);
       if (audio) audio.playSuccess();
 
       let toastText = `Calibrated "${card.topic || 'Topic'}": ${topicStat.status} (${topicStat.accuracy}%)`;
+      if (sm2Result) {
+        toastText += ` • SM-2: ${sm2Result.interval}d interval (Ease: ${sm2Result.easeFactor})`;
+      }
       if (adaptiveNotice) toastText += ` • ${adaptiveNotice}`;
       window.showToast(toastText, evaluation === 'KNEW_IT' ? 'success' : 'warning');
 
@@ -1020,6 +1150,13 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   window.runSyllabusDeconstruction = async () => {
+    const btn = document.getElementById('btn-run-syllabus-deconstruct');
+    const originalText = btn ? btn.innerHTML : '<span>✨</span> Deconstruct & Generate Micro-Sprints';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span class="auth-spinner" style="width:14px; height:14px; border-width:2px; display:inline-block; margin-right:6px;"></span> Deconstructing Syllabus...`;
+    }
+
     const code = document.getElementById('ingest-course-code')?.value.trim() || 'CS-500';
     const name = document.getElementById('ingest-course-name')?.value.trim() || 'Cloud Architectures';
     const rawText = document.getElementById('syllabus-raw-input')?.value.trim() || '';
@@ -1109,7 +1246,12 @@ document.addEventListener('DOMContentLoaded', () => {
       switchView('dashboard');
 
     } catch (err) {
-      window.showToast(`Syllabus AI error: ${err.message}. Added baseline curriculum.`, "warning");
+      window.showToast(`Syllabus AI error: ${err.message}. Retrying or adding baseline...`, "warning");
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
     }
   };
 

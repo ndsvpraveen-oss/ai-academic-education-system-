@@ -34,8 +34,8 @@
   --rose-glow: rgba(244, 63, 94, 0.35);
   
   --text-main: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
   --text-accent: #c4b5fd;
 
   /* Typography */
@@ -76,6 +76,11 @@ html, body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 2px;
 }
 
 /* Custom Scrollbars */
@@ -2013,10 +2018,285 @@ html, body {
   box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.2);
 }
 
+/* ==========================================================================
+   MOBILE & TABLET RESPONSIVENESS & ACCESSIBILITY AUDIT ENHANCEMENTS
+   ========================================================================== */
+
+/* Universal Touch Targets: WCAG 2.5.5 / 2.5.8 Minimum 44x44px Standard */
+.btn-action {
+  min-height: 44px;
+}
+
+.btn-confidence {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.btn-eval {
+  min-height: 44px;
+}
+
+.form-input, .form-select, .form-textarea {
+  min-height: 44px;
+}
+
+.nav-link {
+  min-height: 44px;
+}
+
+/* Sidebar Backdrop for Mobile Drawer */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+
+.sidebar-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Mobile Bottom Navigation Bar (Hidden on Desktop) */
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* Tablet & Mobile Screens (<= 992px) */
+@media (max-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .col-12, .col-8, .col-7, .col-6, .col-5, .col-4, .col-3 {
+    grid-column: span 12 !important;
+    width: 100% !important;
+  }
+
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  #view-study > div {
+    grid-template-columns: 1fr !important;
+    gap: 24px;
+  }
+
+  .advisor-chat-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 600px;
+  }
+
+  .kanban-board-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+/* Mobile Screens (<= 768px): Drawer Transformation & Bottom Bar */
 @media (max-width: 768px) {
+  /* Sidebar transforms into full slide-in drawer */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 285px;
+    max-width: 85vw;
+    height: 100vh;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.85);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  /* Hamburger toggle becomes visible with min 44x44px target */
+  .mobile-menu-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border-bright);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    margin-right: 12px;
+  }
+
+  /* Fixed Mobile Bottom Navigation */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(10, 14, 26, 0.94);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-top: 1px solid var(--glass-border);
+    z-index: 900;
+    padding: 0 8px;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .mobile-bottom-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 48px;
+    min-width: 44px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-main);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    padding: 4px 0;
+    border-radius: 8px;
+  }
+
+  .mobile-bottom-tab .tab-icon {
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+
+  .mobile-bottom-tab.active,
+  .mobile-bottom-tab:hover {
+    color: #ffffff;
+  }
+
+  .mobile-bottom-tab.active .tab-icon {
+    transform: translateY(-1px);
+    filter: drop-shadow(0 0 6px var(--primary-light));
+  }
+
+  /* Prevent Bottom Nav Overlap on Content */
+  .content-body {
+    padding: 18px 14px 85px !important;
+  }
+
+  /* Topbar Mobile Sizing */
+  .topbar {
+    height: 62px;
+    padding: 0 16px;
+  }
+
+  .page-title {
+    font-size: 16.5px;
+  }
+
+  .velocity-ticker {
+    display: none;
+  }
+
+  .topbar-right {
+    gap: 8px;
+  }
+
+  .topbar-right .btn-action {
+    padding: 8px 12px;
+    font-size: 12px;
+    min-height: 40px;
+  }
+
+  /* "What You Should Study Now" Hero Card Responsive Flow */
   .study-now-card {
     flex-direction: column;
     align-items: flex-start;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .study-now-card > div:last-child {
+    width: 100%;
+    align-items: stretch !important;
+  }
+
+  .study-now-card #btn-start-recommended-sprint {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Gantt Container Responsive Scroll */
+  .gantt-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+  }
+
+  .gantt-course-row {
+    min-width: 480px;
+  }
+
+  /* 3D Focus Cockpit Controls */
+  .pomodoro-controls {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .gyro-stage {
+    width: 220px;
+    height: 220px;
+  }
+
+  .ring-outer {
+    width: 210px;
+    height: 210px;
+    margin-top: -105px;
+    margin-left: -105px;
+  }
+
+  .ring-middle {
+    width: 170px;
+    height: 170px;
+    margin-top: -85px;
+    margin-left: -85px;
+  }
+
+  .ring-inner {
+    width: 130px;
+    height: 130px;
+    margin-top: -65px;
+    margin-left: -65px;
+  }
+}
+
+/* Extra Small Phones (<= 480px) */
+@media (max-width: 480px) {
+  .kpi-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .auth-card-view {
+    padding: 24px 18px;
+  }
+
+  .modal-box-3d {
+    width: 95%;
+    padding: 20px 16px;
   }
 }
 
